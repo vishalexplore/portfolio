@@ -325,6 +325,68 @@ const sendEmail = (e) => {
 
 </section> 
 
+{/* ================= CERTIFICATES ================= */}
+
+<section className="certificates" id="certificates">
+
+  <div className="section-title">
+    <span>ACHIEVEMENTS</span>
+    <h2>Certificates</h2>
+  </div>
+
+  <div className="certificate-grid">
+
+    <div className="certificate-card">
+
+      <h3>🏆 PromptWars - Certificate of Appreciation</h3>
+
+      <p>
+        Successfully participated in <strong>PromptWars Virtual</strong>
+        organized by <strong>H2Skill</strong> in collaboration with
+        <strong> Google for Developers</strong>.
+      </p>
+
+      <div className="certificate-info">
+
+        <p><strong>Issued By:</strong> H2Skill</p>
+
+        <p><strong>Issue Date:</strong> 04 August 2026</p>
+
+        <p>
+          <strong>Certificate ID:</strong><br />
+          2026H2S04PWVCHL1-A00407
+        </p>
+
+      </div>
+
+      <div className="certificate-buttons">
+
+        <a
+          href="/certificates/2026H2S04PWVCHL1-A00407.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="project-btn live-btn"
+        >
+          📄 View Certificate
+        </a>
+
+        <a
+          href="https://certificate.hack2skill.com/verify/2026H2S04PWVCHL1-A00407"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="project-btn github-btn"
+        >
+          ✅ Verify
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
       {/* Projects */}
 
       <section className="projects" id="projects">

@@ -12,12 +12,13 @@ function Navbar({ theme, toggleTheme }) {
       setScrolled(window.scrollY > 30);
 
       const sections = [
-        "home",
-        "about",
-        "skills",
-        "projects",
-        "contact",
-      ];
+  "home",
+  "about",
+  "skills",
+  "projects",
+  "certificates",
+  "contact",
+];
 
       sections.forEach((id) => {
         const section = document.getElementById(id);
@@ -84,6 +85,14 @@ function Navbar({ theme, toggleTheme }) {
         >
           Projects
         </a>
+
+        <a
+  href="#certificates"
+  className={active === "certificates" ? "active" : ""}
+  onClick={() => setMenuOpen(false)}
+>
+  Certificates
+</a>
 
         <a
           href="#contact"

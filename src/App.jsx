@@ -1,29 +1,45 @@
 import { useEffect, useState } from "react";
 
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+} from "react-router-dom";
+
 import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import Sections from "./components/Sections";
 import AIChat from "./components/AIChat";
 
+import Home from "./pages/Home";
+import Certificates from "./pages/Certificates";
+
 function App() {
+
   const [theme, setTheme] = useState("dark");
+
   const [scroll, setScroll] = useState(0);
 
-  // Theme
   useEffect(() => {
+
     const savedTheme = localStorage.getItem("theme");
 
     if (savedTheme) {
+
       setTheme(savedTheme);
+
       document.body.className = savedTheme;
+
     } else {
+
       document.body.className = "dark";
+
     }
+
   }, []);
 
-  // Scroll Progress
   useEffect(() => {
+
     const handleScroll = () => {
+
       const totalHeight =
         document.documentElement.scrollHeight -
         document.documentElement.clientHeight;
@@ -32,16 +48,18 @@ function App() {
         (window.scrollY / totalHeight) * 100;
 
       setScroll(progress);
+
     };
 
     window.addEventListener("scroll", handleScroll);
 
     return () =>
       window.removeEventListener("scroll", handleScroll);
+
   }, []);
 
-  // Theme Toggle
   const toggleTheme = () => {
+
     const newTheme =
       theme === "dark" ? "light" : "dark";
 
@@ -50,34 +68,47 @@ function App() {
     document.body.className = newTheme;
 
     localStorage.setItem("theme", newTheme);
+
   };
 
   return (
-    <div className="app">
 
-      {/* Scroll Progress */}
-      <div
-        className="scroll-progress"
-        style={{ width: `${scroll}%` }}
-      ></div>
+    <BrowserRouter>
 
-      {/* Navbar */}
-      <Navbar
-        theme={theme}
-        toggleTheme={toggleTheme}
-      />
+      <div className="app">
 
-      {/* Hero */}
-      <Hero />
+        <div
+          className="scroll-progress"
+          style={{ width: `${scroll}%` }}
+        ></div>
 
-      {/* Sections */}
-      <Sections />
+        <Navbar
+          theme={theme}
+          toggleTheme={toggleTheme}
+        />
 
-      {/* AI Assistant */}
-      <AIChat />
+        <Routes>
 
-    </div>
+          <Route
+            path="/"
+            element={<Home />}
+          />
+
+          <Route
+            path="/certificates"
+            element={<Certificates />}
+          />
+
+        </Routes>
+
+        <AIChat />
+
+      </div>
+
+    </BrowserRouter>
+
   );
+
 }
 
 export default App;

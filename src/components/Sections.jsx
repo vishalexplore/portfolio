@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useRef } from "react";
 import emailjs from "@emailjs/browser";
 import {
@@ -331,57 +332,46 @@ const sendEmail = (e) => {
 
   <div className="section-title">
     <span>ACHIEVEMENTS</span>
-    <h2>Certificates</h2>
+    <h2>Professional Certificates</h2>
   </div>
 
-  <div className="certificate-grid">
+  <div className="certificate-card">
 
-    <div className="certificate-card">
+    <div style={{fontSize:"70px"}}>🏆</div>
 
-      <h3>🏆 PromptWars - Certificate of Appreciation</h3>
+    <h3>Professional Certifications</h3>
 
-      <p>
-        Successfully participated in <strong>PromptWars Virtual</strong>
-        organized by <strong>H2Skill</strong> in collaboration with
-        <strong> Google for Developers</strong>.
-      </p>
+    <p>
+      I continuously improve my skills by participating in
+      hackathons, AI challenges, and technical certification
+      programs.
+    </p>
 
-      <div className="certificate-info">
+    <div className="certificate-stats">
 
-        <p><strong>Issued By:</strong> H2Skill</p>
-
-        <p><strong>Issue Date:</strong> 04 August 2026</p>
-
-        <p>
-          <strong>Certificate ID:</strong><br />
-          2026H2S04PWVCHL1-A00407
-        </p>
-
+      <div>
+        <h2>2+</h2>
+        <span>Certificates</span>
       </div>
 
-      <div className="certificate-buttons">
+      <div>
+        <h2>2026</h2>
+        <span>Latest</span>
+      </div>
 
-        <a
-          href="/certificates/2026H2S04PWVCHL1-A00407.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="project-btn live-btn"
-        >
-          📄 View Certificate
-        </a>
-
-        <a
-          href="https://certificate.hack2skill.com/verify/2026H2S04PWVCHL1-A00407"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="project-btn github-btn"
-        >
-          ✅ Verify
-        </a>
-
+      <div>
+        <h2>H2Skill</h2>
+        <span>Issuer</span>
       </div>
 
     </div>
+
+    <Link
+      to="/certificates"
+      className="project-btn live-btn"
+    >
+      📜 View All Certificates
+    </Link>
 
   </div>
 

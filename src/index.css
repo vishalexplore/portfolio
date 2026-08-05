@@ -2287,3 +2287,279 @@ text-align:center;
 }
 
 }
+.certificate-stats{
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+gap:45px;
+
+margin:35px 0;
+
+text-align:center;
+
+flex-wrap:wrap;
+
+}
+
+.certificate-stats h2{
+
+font-size:32px;
+
+color:var(--accent);
+
+margin-bottom:6px;
+
+}
+
+.certificate-stats span{
+
+opacity:.7;
+
+font-size:15px;
+
+}
+/* =========================================
+   CERTIFICATES PAGE
+========================================= */
+
+.certificates-page{
+
+padding:120px 8%;
+
+min-height:100vh;
+
+}
+
+.certificate-grid{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+
+gap:35px;
+
+margin-top:60px;
+
+}
+
+.certificate-card{
+
+padding:35px;
+
+border-radius:28px;
+
+background:var(--card);
+
+box-shadow:
+15px 15px 30px var(--shadow1),
+-15px -15px 30px var(--shadow2);
+
+transition:.35s;
+
+}
+
+.certificate-card:hover{
+
+transform:translateY(-8px);
+
+}
+
+.certificate-card h3{
+
+font-size:24px;
+
+margin-bottom:15px;
+
+color:var(--accent);
+
+}
+
+.certificate-card p{
+
+line-height:1.8;
+
+opacity:.85;
+
+margin-bottom:15px;
+
+}
+
+.certificate-info{
+
+margin-top:20px;
+
+padding-top:20px;
+
+border-top:1px solid rgba(255,255,255,.08);
+
+line-height:2;
+
+}
+
+.certificate-buttons{
+
+display:flex;
+
+gap:15px;
+
+margin-top:25px;
+
+flex-wrap:wrap;
+
+}
+
+.certificate-buttons a{
+
+text-decoration:none;
+
+padding:14px 22px;
+
+border-radius:15px;
+
+font-weight:600;
+
+transition:.3s;
+
+}
+
+.certificate-buttons a:hover{
+
+transform:translateY(-4px);
+
+}
+
+@media(max-width:768px){
+
+.certificates-page{
+
+padding:90px 20px;
+
+}
+
+.certificate-grid{
+
+grid-template-columns:1fr;
+
+}
+
+.certificate-buttons{
+
+flex-direction:column;
+
+}
+
+.certificate-buttons a{
+
+width:100%;
+
+text-align:center;
+
+}
+
+}
+.certificate-count{
+
+text-align:center;
+
+margin:30px 0;
+
+}
+
+.certificate-count h3{
+
+font-size:28px;
+
+color:var(--accent);
+
+}
+
+.certificate-icon{
+
+font-size:55px;
+
+margin-bottom:20px;
+
+text-align:center;
+
+}
+/* ==========================
+CERTIFICATE TOP
+========================== */
+
+.certificate-top{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin:35px 0 20px;
+
+flex-wrap:wrap;
+
+gap:20px;
+
+}
+
+.certificate-top h3{
+
+font-size:28px;
+
+font-weight:700;
+
+color:var(--accent);
+
+}
+
+/* ==========================
+SEARCH
+========================== */
+
+.certificate-search{
+
+display:flex;
+
+justify-content:center;
+
+margin-bottom:40px;
+
+}
+
+.certificate-search input{
+
+width:100%;
+
+max-width:450px;
+
+padding:16px 22px;
+
+border:none;
+
+outline:none;
+
+border-radius:18px;
+
+background:var(--card);
+
+color:var(--text);
+
+font-size:16px;
+
+box-shadow:
+8px 8px 18px var(--shadow1),
+-8px -8px 18px var(--shadow2);
+
+transition:.3s;
+
+}
+
+.certificate-search input:focus{
+
+transform:scale(1.02);
+
+}

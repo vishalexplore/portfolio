@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { FaMoon, FaSun, FaBars, FaTimes } from "react-icons/fa";
 
 
@@ -16,7 +17,6 @@ function Navbar({ theme, toggleTheme }) {
   "about",
   "skills",
   "projects",
-  "certificates",
   "contact",
 ];
 
@@ -49,9 +49,12 @@ function Navbar({ theme, toggleTheme }) {
         scrolled ? "navbar-scroll" : ""
       }`}
     >
-      <div className="logo">
-        Vishal<span>.</span>
-      </div>
+      <Link
+  to="/"
+  className="logo"
+>
+  Vishal<span>.</span>
+</Link>
 
       <nav className={menuOpen ? "nav active" : "nav"}>
         <a
@@ -86,13 +89,12 @@ function Navbar({ theme, toggleTheme }) {
           Projects
         </a>
 
-        <a
-  href="#certificates"
-  className={active === "certificates" ? "active" : ""}
+        <Link
+  to="/certificates"
   onClick={() => setMenuOpen(false)}
 >
   Certificates
-</a>
+</Link>
 
         <a
           href="#contact"

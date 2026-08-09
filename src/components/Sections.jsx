@@ -1,3 +1,4 @@
+import QRProfileCard from "./QRProfileCard";
 import { Link } from "react-router-dom";
 import { useRef } from "react";
 import emailjs from "@emailjs/browser";
@@ -570,6 +571,7 @@ const sendEmail = (e) => {
   </div>
 
 </section>
+<QRProfileCard />
 
 <footer className="footer">
 

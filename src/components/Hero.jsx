@@ -14,41 +14,30 @@ import {
 import profile from "../assets/profile.png";
 
 function Hero() {
-  const [time, setTime] = useState("");
+  // const [time, setTime] = useState("");
+  const [greeting, setGreeting] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  /* ==========================
-     LIVE CLOCK
-  ========================== */
+/* ==========================
+   DYNAMIC GREETING
+========================== */
 
-  useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
+useEffect(() => {
+  const updateGreeting = () => {
+    const hour = new Date().getHours();
 
-      const currentTime = now.toLocaleTimeString(
-        "en-IN",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: true,
-        }
-      );
+    if (hour < 12) {
+      setGreeting("Good Morning");
+    } else if (hour < 17) {
+      setGreeting("Good Afternoon");
+    } else {
+      setGreeting("Good Evening");
+    }
+  };
 
-      setTime(currentTime);
-    };
-
-    updateClock();
-
-    const interval = setInterval(
-      updateClock,
-      1000
-    );
-
-    return () => clearInterval(interval);
-  }, []);
-
+  updateGreeting();
+}, []);
 
   /* ==========================
      SHARE PORTFOLIO
@@ -175,7 +164,7 @@ function Hero() {
         </div>
 
 
-        <div className="experience-card">
+        {/* <div className="experience-card">
 
           <h2>7+</h2>
 
@@ -183,7 +172,7 @@ function Hero() {
             Projects Completed
           </span>
 
-        </div>
+        </div> */}
 
       </div>
 
@@ -201,13 +190,13 @@ function Hero() {
           <span className="live-dot"></span>
 
           <span>
-            Available for Internship
+            Available for Internship and Jobs
           </span>
 
         </div>
 
 
-        {/* LIVE CLOCK */}
+        {/* LIVE CLOCK
 
         <div className="live-clock">
 
@@ -225,39 +214,42 @@ function Hero() {
 
           </div>
 
-        </div>
+        </div> */}
 
 
         {/* HEADING */}
 
-        <h1>
-          Hi, I'm <span>Vishal</span>
-        </h1>
+       <div className="hero-greeting">
+  {greeting}
+</div>
+
+<h1>
+  Hi, I'm <span>Vishal</span>
+</h1>
 
 
         {/* TYPING */}
 
         <div className="typing">
-
-          <TypeAnimation
-            sequence={[
-              "Full Stack Developer",
-              2000,
-              "React Developer",
-              2000,
-              "Frontend Developer",
-              2000,
-              "UI/UX Designer",
-              2000,
-              "AI Enthusiast",
-              2000,
-            ]}
-            wrapper="span"
-            speed={45}
-            repeat={Infinity}
-          />
-
-        </div>
+  <TypeAnimation
+    sequence={[
+      "Full Stack Developer",
+      2000,
+      "React Developer",
+      2000,
+      "Frontend Developer",
+      2000,
+      "UI/UX Designer",
+      2000,
+      "AI Enthusiast",
+      2000,
+    ]}
+    wrapper="span"
+    speed={45}
+    repeat={Infinity}
+    cursor={false}
+  />
+</div>
 
 
         {/* DESCRIPTION */}

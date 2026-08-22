@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { TypeAnimation } from "react-type-animation";
+
 import {
   FaGithub,
   FaLinkedin,
@@ -14,34 +15,75 @@ import {
 import profile from "../assets/profile.png";
 
 function Hero() {
-  // const [time, setTime] = useState("");
   const [greeting, setGreeting] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-/* ==========================
-   DYNAMIC GREETING
-========================== */
+  // PHOTO → INFO → QR → PHOTO
+  const [photoMode, setPhotoMode] = useState("photo");
+  
 
-useEffect(() => {
-  const updateGreeting = () => {
-    const hour = new Date().getHours();
+  /* =========================================
+     PHOTO CARD CLICK
+  ========================================= */
 
-    if (hour < 12) {
-      setGreeting("Good Morning");
-    } else if (hour < 17) {
-      setGreeting("Good Afternoon");
+  const handlePhotoClick = () => {
+    if (photoMode === "photo") {
+      setPhotoMode("info");
+    } else if (photoMode === "info") {
+      setPhotoMode("qr");
     } else {
-      setGreeting("Good Evening");
+      setPhotoMode("photo");
     }
   };
 
-  updateGreeting();
-}, []);
 
-  /* ==========================
-     SHARE PORTFOLIO
-  ========================== */
+  /* =========================================
+     SCROLL → RETURN TO PHOTO
+  ========================================= */
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setPhotoMode("photo");
+    };
+
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    return () => {
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
+    };
+  }, []);
+
+
+  /* =========================================
+     GREETING
+  ========================================= */
+
+  useEffect(() => {
+    const updateGreeting = () => {
+      const hour = new Date().getHours();
+
+      if (hour < 12) {
+        setGreeting("Good Morning");
+      } else if (hour < 17) {
+        setGreeting("Good Afternoon");
+      } else {
+        setGreeting("Good Evening");
+      }
+    };
+
+    updateGreeting();
+  }, []);
+
+
+  /* =========================================
+     PORTFOLIO URL
+  ========================================= */
 
   const portfolioUrl =
     window.location.origin;
@@ -50,9 +92,9 @@ useEffect(() => {
     "Check out Vishal Sharma's Portfolio 🚀";
 
 
-  /* ==========================
+  /* =========================================
      NATIVE SHARE
-  ========================== */
+  ========================================= */
 
   const nativeShare = async () => {
     if (navigator.share) {
@@ -64,7 +106,7 @@ useEffect(() => {
           url: portfolioUrl,
         });
       } catch (error) {
-        // User closed share dialog
+        // User cancelled sharing
       }
     } else {
       copyLink();
@@ -72,9 +114,9 @@ useEffect(() => {
   };
 
 
-  /* ==========================
+  /* =========================================
      COPY LINK
-  ========================== */
+  ========================================= */
 
   const copyLink = async () => {
     try {
@@ -97,9 +139,9 @@ useEffect(() => {
   };
 
 
-  /* ==========================
+  /* =========================================
      WHATSAPP
-  ========================== */
+  ========================================= */
 
   const shareWhatsApp = () => {
     const url =
@@ -115,9 +157,9 @@ useEffect(() => {
   };
 
 
-  /* ==========================
+  /* =========================================
      LINKEDIN
-  ========================== */
+  ========================================= */
 
   const shareLinkedIn = () => {
     const url =
@@ -139,47 +181,78 @@ useEffect(() => {
       id="home"
     >
 
-      {/* ==========================
-          BACKGROUND BLUR
-      ========================== */}
+      {/* =====================================
+          BACKGROUND
+      ===================================== */}
 
       <div className="hero-blur"></div>
 
 
-      {/* ==========================
+      {/* =====================================
           LEFT
-      ========================== */}
+      ===================================== */}
 
       <div className="hero-left">
 
-        <div className="photo-card">
+        {/* =================================
+            PHOTO / INFO / QR CARD
+        ================================= */}
 
-          <img
-            src={profile}
-            alt="Vishal Sharma"
-          />
+        {/* =========================================
+    PHOTO CARD
+    PHOTO → INFO → PHOTO
+========================================= */}
 
-          <div className="online-dot"></div>
+<div
+  className={`photo-card photo-mode-${photoMode}`}
+  onClick={handlePhotoClick}
+>
+  <div className="photo-card-inner">
 
-        </div>
+    {/* PHOTO */}
+    <div className="photo-card-face photo-card-front">
+      <img
+        src={profile}
+        alt="Vishal"
+      />
+    </div>
 
+    {/* INFO */}
+    <div className="photo-card-face photo-card-info">
 
-        {/* <div className="experience-card">
+      <div className="back-icon">
+        ⚡
+      </div>
 
-          <h2>7+</h2>
+      <h3>
+        Vishal
+      </h3>
 
-          <span>
-            Projects Completed
-          </span>
+      <p>
+        Full Stack Developer
+      </p>
 
-        </div> */}
+      <div className="back-skills">
+        <span>React</span>
+        <span>Node.js</span>
+        <span>JavaScript</span>
+        <span>AI / ML</span>
+      </div>
 
+      <small>
+        Click to see photo
+      </small>
+
+    </div>
+
+  </div>
+</div>
       </div>
 
 
-      {/* ==========================
+      {/* =====================================
           RIGHT
-      ========================== */}
+      ===================================== */}
 
       <div className="hero-right">
 
@@ -196,60 +269,48 @@ useEffect(() => {
         </div>
 
 
-        {/* LIVE CLOCK
+        {/* GREETING */}
 
-        <div className="live-clock">
-
-          <div className="clock-dot"></div>
-
-          <div>
-
-            <h3>
-              {time}
-            </h3>
-
-            <span>
-              📍 India
-            </span>
-
-          </div>
-
-        </div> */}
+        <div className="hero-greeting">
+          {greeting}
+        </div>
 
 
         {/* HEADING */}
 
-       <div className="hero-greeting">
-  {greeting}
-</div>
-
-<h1>
-  Hi, I'm <span>Vishal</span>
-</h1>
+        <h1>
+          Hi, I'm <span>Vishal</span>
+        </h1>
 
 
         {/* TYPING */}
 
         <div className="typing">
-  <TypeAnimation
-    sequence={[
-      "Full Stack Developer",
-      2000,
-      "React Developer",
-      2000,
-      "Frontend Developer",
-      2000,
-      "UI/UX Designer",
-      2000,
-      "AI Enthusiast",
-      2000,
-    ]}
-    wrapper="span"
-    speed={45}
-    repeat={Infinity}
-    cursor={false}
-  />
-</div>
+
+          <TypeAnimation
+            sequence={[
+              "Full Stack Developer",
+              2000,
+
+              "React Developer",
+              2000,
+
+              "Frontend Developer",
+              2000,
+
+              "UI/UX Designer",
+              2000,
+
+              "AI Enthusiast",
+              2000,
+            ]}
+            wrapper="span"
+            speed={45}
+            repeat={Infinity}
+            cursor={false}
+          />
+
+        </div>
 
 
         {/* DESCRIPTION */}
@@ -266,9 +327,7 @@ useEffect(() => {
         </p>
 
 
-        {/* ==========================
-            BUTTONS
-        ========================== */}
+        {/* BUTTONS */}
 
         <div className="hero-buttons">
 
@@ -285,13 +344,13 @@ useEffect(() => {
             download
             className="secondary-btn"
           >
+
             <FaDownload />
 
             Resume
+
           </a>
 
-
-          {/* SHARE BUTTON */}
 
           <button
             className="secondary-btn share-btn"
@@ -310,15 +369,13 @@ useEffect(() => {
           </button>
 
 
-          {/* ==========================
+          {/* ===============================
               SHARE MENU
-          ========================== */}
+          =============================== */}
 
           {shareOpen && (
 
             <div className="share-menu">
-
-              {/* HEADER */}
 
               <div className="share-menu-header">
 
@@ -341,16 +398,17 @@ useEffect(() => {
                     setShareOpen(false)
                   }
                   aria-label="Close share menu"
-                  title="Close"
                   type="button"
                 >
+
                   <FaTimes />
+
                 </button>
 
               </div>
 
 
-              {/* NATIVE SHARE */}
+              {/* DEVICE SHARE */}
 
               <button
                 className="share-option"
@@ -377,7 +435,7 @@ useEffect(() => {
               </button>
 
 
-              {/* COPY LINK */}
+              {/* COPY */}
 
               <button
                 className="share-option"
@@ -460,8 +518,6 @@ useEffect(() => {
               </button>
 
 
-              {/* URL */}
-
               <div className="share-url">
                 {portfolioUrl}
               </div>
@@ -473,9 +529,9 @@ useEffect(() => {
         </div>
 
 
-        {/* ==========================
+        {/* =====================================
             SOCIAL
-        ========================== */}
+        ===================================== */}
 
         <div className="hero-social">
 
@@ -513,9 +569,9 @@ useEffect(() => {
       </div>
 
 
-      {/* ==========================
+      {/* =====================================
           FLOATING WIDGETS
-      ========================== */}
+      ===================================== */}
 
       <div className="widget react-widget">
         ⚛ React

@@ -570,43 +570,99 @@ font-size:17px;
     position:relative;
 }
 
-.photo-card{
+/* =========================================
+   3D PHOTO FLIP
+========================================= */
 
-    width:380px;
-    height:380px;
+/* Flip */
 
-    border-radius:35px;
+/* =========================================
+   FRONT
+========================================= */
 
-    padding:12px;
+/* =========================================
+   BACK
+========================================= */
 
-    background:var(--card);
 
-    position:relative;
+/* Back icon */
 
-    box-shadow:
-    18px 18px 35px var(--shadow1),
-    -18px -18px 35px var(--shadow2);
+.back-icon {
+  width: 65px;
+  height: 65px;
 
-    transition:.4s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
+  border-radius: 20px;
+
+  background: rgba(
+    255,
+    255,
+    255,
+    0.08
+  );
+
+  font-size: 30px;
+
+  margin-bottom: 18px;
 }
 
-.photo-card:hover{
 
-    transform:
-    translateY(-12px)
-    rotate(-2deg);
+/* Back heading */
 
+/* Role */
+
+/* Skills */
+
+.back-skills {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  max-width: 280px;
 }
 
-.photo-card img{
 
-    width:100%;
-    height:100%;
+.back-skills span {
+  padding: 8px 12px;
 
-    object-fit:cover;
+  border-radius: 999px;
 
-    border-radius:28px;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.07
+  );
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.1);
+
+  font-size: 12px;
+}
+
+
+/* Hint */
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+ 
+.back-icon {
+    width: 52px;
+    height: 52px;
+
+    font-size: 24px;
+  }
 
 }
 
@@ -1050,14 +1106,6 @@ width:100%;
 
 }
 
-.photo-card{
-
-width:300px;
-
-height:300px;
-
-}
-
 .hero-right h1{
 
 font-size:48px;
@@ -1093,14 +1141,6 @@ margin:30px auto 0;
 }
 
 @media(max-width:500px){
-
-.photo-card{
-
-width:240px;
-
-height:240px;
-
-}
 
 .hero-right h1{
 
@@ -4183,4 +4223,319 @@ body[data-accent="orange"] {
 
   line-height: 1.4;
   
+}
+
+
+
+
+
+/* =========================================
+   PHOTO CARD - PHOTO → INFO → PHOTO
+========================================= */
+
+.photo-card {
+  width: 300px;
+  height: 300px;
+
+  position: relative;
+  perspective: 1200px;
+
+  cursor: pointer;
+  flex-shrink: 0;
+
+  /* Remove blue click/tap highlight */
+  -webkit-tap-highlight-color: transparent;
+  tap-highlight-color: transparent;
+
+  /* Prevent text selection */
+  user-select: none;
+  -webkit-user-select: none;
+
+  /* Prevent browser focus outline */
+  outline: none;
+}
+
+
+/* =========================================
+   INNER
+========================================= */
+
+.photo-card-inner {
+  width: 100%;
+  height: 100%;
+
+  position: relative;
+
+  transform-style: preserve-3d;
+
+  /* FAST FLIP */
+  transition:
+    transform 0.25s
+    cubic-bezier(0.4, 0.2, 0.2, 1);
+
+  will-change: transform;
+}
+
+
+/* =========================================
+   PHOTO / INFO STATES
+========================================= */
+
+.photo-mode-photo .photo-card-inner {
+  transform: rotateY(0deg);
+}
+
+.photo-mode-info .photo-card-inner {
+  transform: rotateY(180deg);
+}
+
+
+/* =========================================
+   REMOVE CLICK EFFECT
+========================================= */
+
+.photo-card:focus,
+.photo-card:active {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+/* =========================================
+   COMMON CARD FACE
+========================================= */
+
+.photo-card-face {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  border-radius: 38px;
+
+  overflow: hidden;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  /* Border */
+  border: 10px solid var(--accent);
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 0 12px rgb(229, 154, 229),
+    18px 18px 35px var(--shadow1),
+    -18px -18px 35px var(--shadow2);
+}
+
+
+/* =========================================
+   PHOTO FRONT
+========================================= */
+
+.photo-card-front {
+  transform: rotateY(0deg);
+
+  background: var(--card);
+}
+
+.photo-card-front img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  border-radius: 28px;
+
+  /* Prevent image drag */
+  -webkit-user-drag: none;
+}
+
+
+/* =========================================
+   INFO BACK
+========================================= */
+
+.photo-card-info {
+  transform: rotateY(180deg);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 22px;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(108, 99, 255, 0.22),
+      transparent 60%
+    ),
+    var(--card);
+}
+
+
+/* =========================================
+   INFO ICON
+========================================= */
+
+.photo-card-info .back-icon {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 15px;
+
+  background:
+    rgba(255, 255, 255, 0.08);
+
+  font-size: 24px;
+
+  margin-bottom: 13px;
+}
+
+
+/* =========================================
+   INFO NAME
+========================================= */
+
+.photo-card-info h3 {
+  margin: 0;
+
+  font-size: 24px;
+
+  font-weight: 700;
+
+  color: var(--text);
+}
+
+
+/* =========================================
+   INFO ROLE
+========================================= */
+
+.photo-card-info p {
+  margin: 6px 0 17px;
+
+  color: var(--accent);
+
+  font-size: 14px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================
+   SKILLS
+========================================= */
+
+.photo-card-info .back-skills {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 7px;
+
+  max-width: 235px;
+}
+
+.photo-card-info .back-skills span {
+  padding: 7px 10px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255, 255, 255, 0.07);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.1);
+
+  font-size: 11px;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   INFO HINT
+========================================= */
+
+.photo-card-info small {
+  margin-top: 17px;
+
+  font-size: 10px;
+
+  opacity: 0.5;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+  .photo-card {
+    width: 250px;
+    height: 250px;
+  }
+
+  .photo-card-info {
+    padding: 18px;
+  }
+
+  .photo-card-info h3 {
+    font-size: 21px;
+  }
+
+  .photo-card-info p {
+    font-size: 13px;
+
+    margin-bottom: 14px;
+  }
+
+  .photo-card-info .back-icon {
+    width: 48px;
+    height: 48px;
+
+    font-size: 22px;
+
+    margin-bottom: 11px;
+  }
+
+  .photo-card-info .back-skills {
+    max-width: 210px;
+
+    gap: 6px;
+  }
+
+  .photo-card-info .back-skills span {
+    padding: 6px 9px;
+
+    font-size: 10px;
+  }
+
+  .photo-card-info small {
+    margin-top: 14px;
+  }
+
 }

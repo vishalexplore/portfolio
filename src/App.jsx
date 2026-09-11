@@ -9,6 +9,7 @@ import {
 
 import Navbar from "./components/Navbar";
 import AIChat from "./components/AIChat";
+import IntroScreen from "./IntroScreen";
 
 import Home from "./pages/Home";
 import Certificates from "./pages/Certificates";
@@ -45,10 +46,10 @@ function App() {
 
 
   /* ==========================
-     LOADING
+     INTRO SCREEN
   ========================== */
 
-  const [loading, setLoading] = useState(true);
+  const [showIntro, setShowIntro] = useState(true);
 
 
   /* ==========================
@@ -82,25 +83,6 @@ function App() {
     );
 
   }, [accent]);
-
-
-  /* ==========================
-     CUSTOM LOADING SCREEN
-  ========================== */
-
-  useEffect(() => {
-
-    const timer = setTimeout(() => {
-
-      setLoading(false);
-
-    }, 1200);
-
-
-    return () =>
-      clearTimeout(timer);
-
-  }, []);
 
 
   /* ==========================
@@ -189,42 +171,13 @@ function App() {
 
 
       {/* ==========================
-          CUSTOM LOADING SCREEN
+          APPLE-INSPIRED INTRO
       ========================== */}
 
-      {loading && (
-
-        <div className="loading-screen">
-
-          <div className="loading-content">
-
-
-            <div className="loading-logo">
-              V<span>.</span>
-            </div>
-
-
-            <h2>
-              Vishal Sharma
-            </h2>
-
-
-            <p>
-              Loading Portfolio...
-            </p>
-
-
-            <div className="loading-bar">
-
-              <div className="loading-bar-fill"></div>
-
-            </div>
-
-
-          </div>
-
-        </div>
-
+      {showIntro && (
+        <IntroScreen
+          onFinish={() => setShowIntro(false)}
+        />
       )}
 
 

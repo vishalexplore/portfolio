@@ -12,7 +12,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 
-import profile from "../assets/profile.png";
+import profile from "../assets/profile.jpeg";
 
 function Hero() {
   const [greeting, setGreeting] = useState("");

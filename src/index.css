@@ -4690,4 +4690,349 @@ body[data-accent="orange"] {
     display: none;
   }
 
+}/* =========================================
+   VOICE ASSISTANT
+========================================= */
+
+.voice-assistant {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 9990;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 13px 18px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+
+  background: rgba(20, 20, 25, 0.88);
+  color: #fff;
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.voice-assistant:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 14px 35px rgba(0, 0, 0, 0.45),
+    0 0 25px rgba(108, 99, 255, 0.25);
+}
+
+.voice-assistant:active {
+  transform: scale(0.96);
+}
+
+.voice-icon {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(108, 99, 255, 0.18);
+
+  font-size: 16px;
+}
+
+.voice-text {
+  white-space: nowrap;
+}
+
+/* Listening animation */
+
+.voice-listening {
+  border-color: rgba(108, 99, 255, 0.6);
+
+  box-shadow:
+    0 0 0 4px rgba(108, 99, 255, 0.08),
+    0 0 30px rgba(108, 99, 255, 0.35);
+}
+
+.voice-listening .voice-icon {
+  animation: voicePulse 1s infinite ease-in-out;
+}
+
+@keyframes voicePulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(108, 99, 255, 0.35);
+  }
+
+  50% {
+    transform: scale(1.12);
+    box-shadow: 0 0 0 9px rgba(108, 99, 255, 0);
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .voice-assistant {
+    right: 16px;
+    bottom: 16px;
+
+    padding: 12px 15px;
+  }
+
+  .voice-text {
+    font-size: 13px;
+  }
+}
+/* =========================================
+   VOICE ASSISTANT - ABOVE AI CHAT
+========================================= */
+
+.voice-assistant {
+  z-index: 10001 !important;
+}
+.voice-assistant {
+  right: 28px;
+  bottom: 95px;
+  z-index: 10001 !important;
+}
+
+@media (max-width: 600px) {
+  .voice-assistant {
+    right: 16px;
+    bottom: 85px;
+  }
+}
+
+/* =========================================
+   NAVBAR VOICE BUTTON
+========================================= */
+
+.voice-nav-btn {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+  color: inherit;
+
+  font-size: 16px;
+
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.voice-nav-btn:hover {
+  transform: scale(1.08);
+  background: rgba(128, 128, 128, 0.12);
+}
+
+.voice-nav-btn:active {
+  transform: scale(0.92);
+}
+
+/* Remove old floating voice button */
+
+.voice-assistant {
+  display: none !important;
+}
+/* =========================================
+   MOBILE THEME OPTION
+========================================= */
+
+.mobile-theme-option {
+  display: none;
+}
+
+@media (max-width: 768px) {
+
+  /* Hide desktop theme button */
+
+  .theme-btn {
+    display: none !important;
+  }
+
+  /* Theme inside mobile menu */
+
+  .mobile-theme-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    width: 100%;
+
+    margin-top: 10px;
+    padding: 13px 18px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: rgba(128, 128, 128, 0.10);
+    color: inherit;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+
+    transition: 0.2s ease;
+  }
+
+  .mobile-theme-option:hover {
+    background: rgba(128, 128, 128, 0.16);
+  }
+
+  .mobile-theme-option svg {
+    font-size: 17px;
+  }
+}
+/* =========================================
+   RAISED NAVBAR MIC BUTTON
+========================================= */
+
+.voice-nav-btn {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  background: var(--bg, inherit);
+  color: inherit;
+
+  font-size: 15px;
+
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+
+  /* Raised / 3D effect */
+  box-shadow:
+    4px 4px 8px var(--shadow1, rgba(0, 0, 0, 0.28)),
+    -4px -4px 8px var(--shadow2, rgba(255, 255, 255, 0.08)),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.08);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+/* Hover */
+
+.voice-nav-btn:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    5px 5px 11px var(--shadow1, rgba(0, 0, 0, 0.32)),
+    -5px -5px 11px var(--shadow2, rgba(255, 255, 255, 0.09)),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+/* Press */
+
+.voice-nav-btn:active {
+  transform: translateY(1px) scale(0.94);
+
+  box-shadow:
+    inset 3px 3px 6px var(--shadow1, rgba(0, 0, 0, 0.25)),
+    inset -2px -2px 5px var(--shadow2, rgba(255, 255, 255, 0.06));
+}
+
+/* Mic icon */
+
+.voice-nav-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.voice-nav-btn:hover svg {
+  transform: scale(1.08);
+}
+/* Same size for Mic and Menu buttons */
+
+.voice-nav-btn,
+.menu-btn {
+  width: 38px !important;
+  height: 38px !important;
+
+  min-width: 38px;
+  min-height: 38px;
+
+  padding: 0 !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+}
+
+/* Remove blue tap/click highlight from mobile */
+.nav a,
+.nav button,
+.menu-btn,
+.theme-btn,
+.voice-nav-btn,
+.mobile-theme-option {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none;
+  outline: none !important;
+}
+
+.nav a:focus,
+.nav a:active,
+.nav button:focus,
+.nav button:active,
+.menu-btn:focus,
+.menu-btn:active,
+.theme-btn:focus,
+.theme-btn:active,
+.voice-nav-btn:focus,
+.voice-nav-btn:active,
+.mobile-theme-option:focus,
+.mobile-theme-option:active {
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none !important;
 }

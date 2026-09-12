@@ -10,6 +10,7 @@ import {
 import Navbar from "./components/Navbar";
 import AIChat from "./components/AIChat";
 import IntroScreen from "./IntroScreen";
+import VoiceAssistant from "./components/VoiceAssistant";
 
 import Home from "./pages/Home";
 import Certificates from "./pages/Certificates";
@@ -254,10 +255,16 @@ function App() {
 
 
         {/* ==========================
-            AI ASSISTANT
-        ========================== */}
+    AI ASSISTANT
+========================== */}
 
-        <AIChat />
+<AIChat />
+
+{/* ==========================
+    VOICE ASSISTANT
+========================== */}
+
+<VoiceAssistant />
 
 
       </div>

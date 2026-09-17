@@ -14,6 +14,7 @@ import VoiceAssistant from "./components/VoiceAssistant";
 
 import Home from "./pages/Home";
 import Certificates from "./pages/Certificates";
+import Resume from "./pages/Resume";
 
 
 function App() {
@@ -41,9 +42,7 @@ function App() {
   ========================== */
 
   const [scroll, setScroll] = useState(0);
-
-  const [showTopButton, setShowTopButton] =
-    useState(false);
+  const [showTopButton, setShowTopButton] = useState(false);
 
 
   /* ==========================
@@ -58,14 +57,12 @@ function App() {
   ========================== */
 
   useEffect(() => {
-
     document.body.className = theme;
 
     localStorage.setItem(
       "theme",
       theme
     );
-
   }, [theme]);
 
 
@@ -74,15 +71,12 @@ function App() {
   ========================== */
 
   useEffect(() => {
-
-    document.body.dataset.accent =
-      accent;
+    document.body.dataset.accent = accent;
 
     localStorage.setItem(
       "accent",
       accent
     );
-
   }, [accent]);
 
 
@@ -99,20 +93,16 @@ function App() {
         document.documentElement.scrollHeight -
         document.documentElement.clientHeight;
 
-
       const progress =
         totalHeight > 0
           ? (window.scrollY / totalHeight) * 100
           : 0;
 
-
       setScroll(progress);
-
 
       setShowTopButton(
         window.scrollY > 400
       );
-
     };
 
 
@@ -121,17 +111,14 @@ function App() {
       handleScroll
     );
 
-
     handleScroll();
 
 
     return () => {
-
       window.removeEventListener(
         "scroll",
         handleScroll
       );
-
     };
 
   }, []);
@@ -170,7 +157,6 @@ function App() {
 
     <BrowserRouter>
 
-
       {/* ==========================
           APPLE-INSPIRED INTRO
       ========================== */}
@@ -187,7 +173,6 @@ function App() {
       ========================== */}
 
       <div className="app">
-
 
         {/* ==========================
             SCROLL PROGRESS
@@ -208,7 +193,6 @@ function App() {
         <Navbar
           theme={theme}
           toggleTheme={toggleTheme}
-
           accent={accent}
           setAccent={setAccent}
         />
@@ -225,10 +209,14 @@ function App() {
             element={<Home />}
           />
 
-
           <Route
             path="/certificates"
             element={<Certificates />}
+          />
+
+          <Route
+            path="/resume"
+            element={<Resume />}
           />
 
         </Routes>
@@ -246,34 +234,30 @@ function App() {
             aria-label="Back to top"
             title="Back to top"
           >
-
             <FaArrowUp />
-
           </button>
 
         )}
 
 
         {/* ==========================
-    AI ASSISTANT
-========================== */}
+            AI ASSISTANT
+        ========================== */}
 
-<AIChat />
+        <AIChat />
 
-{/* ==========================
-    VOICE ASSISTANT
-========================== */}
 
-<VoiceAssistant />
+        {/* ==========================
+            VOICE ASSISTANT
+        ========================== */}
 
+        <VoiceAssistant />
 
       </div>
-
 
     </BrowserRouter>
 
   );
-
 }
 
 

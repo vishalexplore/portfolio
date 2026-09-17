@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
 import {
   FaReact,
@@ -27,25 +27,605 @@ function Sections() {
 
   const form = useRef();
 
-const sendEmail = (e) => {
-  e.preventDefault();
 
-  emailjs
-    .sendForm(
-      "service_dsxso57",
-      "template_3l3s268",
-      form.current,
-      "v4eFm7ZlT-h639THZ"
-    )
-    .then(() => {
-      alert("✅ Message Sent Successfully!");
-      form.current.reset();
-    })
-    .catch((error) => {
-      console.log(error);
-      alert("❌ Failed to send message.");
-    });
+
+/* =========================
+   FOOTER DRAGGING
+   + MOMENTUM
+   + APPLE STYLE TICK
+========================= */
+
+const footerTextRef = useRef(null);
+
+const footerPosition = useRef(0);
+
+const dragStartX = useRef(0);
+const dragStartPosition = useRef(0);
+
+const animationFrame = useRef(null);
+
+
+/* =========================
+   MOMENTUM
+========================= */
+
+const lastDragX = useRef(0);
+const lastDragTime = useRef(0);
+
+const footerVelocity = useRef(0);
+
+
+/* =========================
+   TICK SOUND
+========================= */
+
+const audioContextRef = useRef(null);
+const lastTickTimeRef = useRef(0);
+
+
+/* =========================
+   DRAG STATE
+========================= */
+
+const [isDraggingFooter, setIsDraggingFooter] =
+  useState(false);
+
+
+/* =========================
+   APPLE STYLE TICK SOUND
+========================= */
+
+const playFooterTick = async (speed) => {
+
+  const now = performance.now();
+
+
+  /*
+    Fast drag = fast ticks
+    Slow drag = slow ticks
+  */
+
+  const interval = Math.max(
+    35,
+    130 - Math.min(speed * 5, 95)
+  );
+
+
+  if (
+    now - lastTickTimeRef.current <
+    interval
+  ) {
+    return;
+  }
+
+
+  lastTickTimeRef.current = now;
+
+
+  try {
+
+    if (!audioContextRef.current) {
+
+      const AudioContext =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+      if (!AudioContext) return;
+
+      audioContextRef.current =
+        new AudioContext();
+
+    }
+
+
+    const ctx =
+      audioContextRef.current;
+
+
+    if (ctx.state === "suspended") {
+
+      await ctx.resume();
+
+    }
+
+
+    const oscillator =
+      ctx.createOscillator();
+
+    const gain =
+      ctx.createGain();
+
+
+    /*
+      Soft mechanical click
+    */
+
+    oscillator.type = "triangle";
+
+    oscillator.frequency.setValueAtTime(
+      1450,
+      ctx.currentTime
+    );
+
+
+    /*
+      Low volume
+    */
+
+    gain.gain.setValueAtTime(
+      0.0001,
+      ctx.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.018,
+      ctx.currentTime + 0.002
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.0001,
+      ctx.currentTime + 0.028
+    );
+
+
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+
+
+    oscillator.start(
+      ctx.currentTime
+    );
+
+    oscillator.stop(
+      ctx.currentTime + 0.03
+    );
+
+  } catch (error) {
+
+    console.log(
+      "Footer tick error:",
+      error
+    );
+
+  }
+
 };
+
+
+/* =========================
+   GET TEXT WIDTH
+========================= */
+
+const getFooterTextWidth = () => {
+
+  if (!footerTextRef.current) {
+    return 0;
+  }
+
+  return (
+    footerTextRef.current.scrollWidth / 3
+  );
+
+};
+
+
+/* =========================
+   INFINITE LOOP
+========================= */
+
+const normalizeFooterPosition = () => {
+
+  const textWidth =
+    getFooterTextWidth();
+
+
+  if (textWidth <= 0) return;
+
+
+  while (
+    footerPosition.current >= 0
+  ) {
+
+    footerPosition.current -=
+      textWidth;
+
+  }
+
+
+  while (
+    footerPosition.current <=
+    -textWidth
+  ) {
+
+    footerPosition.current +=
+      textWidth;
+
+  }
+
+};
+
+
+/* =========================
+   APPLY POSITION
+========================= */
+
+const updateFooterPosition = () => {
+
+  if (!footerTextRef.current) {
+    return;
+  }
+
+
+  normalizeFooterPosition();
+
+
+  footerTextRef.current.style.transform =
+    `translate3d(
+      ${footerPosition.current}px,
+      0,
+      0
+    )`;
+
+};
+
+
+/* =========================
+   AUTO MOVE
+   + MOMENTUM
+========================= */
+
+useEffect(() => {
+
+  let lastTime =
+    performance.now();
+
+
+  const animateFooter = (time) => {
+
+    const delta =
+      time - lastTime;
+
+    lastTime = time;
+
+
+    /*
+      Only automatic movement
+      when user is not dragging
+    */
+
+    if (
+      !isDraggingFooter &&
+      footerTextRef.current
+    ) {
+
+      /*
+        Normal automatic speed
+      */
+
+      footerPosition.current -=
+        delta * 0.035;
+
+
+      /*
+        Momentum after fast swipe
+      */
+
+      if (
+  Math.abs(
+    footerVelocity.current
+  ) > 0.001
+) {
+
+  const momentumSpeed =
+    Math.abs(
+      footerVelocity.current
+    );
+
+  /*
+    Momentum movement
+  */
+
+  footerPosition.current +=
+    footerVelocity.current *
+    delta *
+    7;
+
+
+  /*
+    Momentum ke time bhi
+    speed-based tik sound
+  */
+
+  if (momentumSpeed > 0.02) {
+    playFooterTick(
+      momentumSpeed * 10
+    );
+  }
+
+
+  /*
+    Smooth slowdown
+  */
+
+  footerVelocity.current *=
+    Math.pow(
+      0.965,
+      delta / 16.67
+    );
+
+}
+
+
+      /*
+        Update infinite position
+      */
+
+      updateFooterPosition();
+
+    }
+
+
+    animationFrame.current =
+      requestAnimationFrame(
+        animateFooter
+      );
+
+  };
+
+
+  animationFrame.current =
+    requestAnimationFrame(
+      animateFooter
+    );
+
+
+  return () => {
+
+    cancelAnimationFrame(
+      animationFrame.current
+    );
+
+  };
+
+}, [isDraggingFooter]);
+
+
+/* =========================
+   DRAG START
+========================= */
+
+const handleFooterPointerDown = (e) => {
+
+  setIsDraggingFooter(true);
+
+
+  /*
+    Starting position
+  */
+
+  dragStartX.current =
+    e.clientX;
+
+  dragStartPosition.current =
+    footerPosition.current;
+
+
+  /*
+    Velocity tracking
+  */
+
+  lastDragX.current =
+    e.clientX;
+
+  lastDragTime.current =
+    performance.now();
+
+
+  /*
+    Stop previous momentum
+  */
+
+  footerVelocity.current = 0;
+
+
+  /*
+    Unlock audio
+  */
+
+  try {
+
+    if (!audioContextRef.current) {
+
+      const AudioContext =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+      if (AudioContext) {
+
+        audioContextRef.current =
+          new AudioContext();
+
+      }
+
+    }
+
+
+    if (
+      audioContextRef.current &&
+      audioContextRef.current.state ===
+        "suspended"
+    ) {
+
+      audioContextRef.current.resume();
+
+    }
+
+  } catch (error) {
+
+    console.log(
+      "Audio initialization error:",
+      error
+    );
+
+  }
+
+
+  /*
+    Capture pointer
+  */
+
+  e.currentTarget.setPointerCapture(
+    e.pointerId
+  );
+
+};
+
+
+/* =========================
+   DRAG MOVE
+========================= */
+
+const handleFooterPointerMove = (e) => {
+
+  if (!isDraggingFooter) {
+    return;
+  }
+
+
+  const currentX =
+    e.clientX;
+
+  const currentTime =
+    performance.now();
+
+
+  /*
+    Total drag distance
+  */
+
+  const movement =
+    currentX -
+    dragStartX.current;
+
+
+  footerPosition.current =
+    dragStartPosition.current +
+    movement;
+
+
+  /*
+    Calculate velocity
+  */
+
+  const dx =
+    currentX -
+    lastDragX.current;
+
+  const dt =
+    currentTime -
+    lastDragTime.current;
+
+
+  if (dt > 0) {
+
+    /*
+      Amplify velocity
+      for stronger momentum
+    */
+
+    footerVelocity.current =
+      (dx / dt) * 3.5;
+
+  }
+
+
+  lastDragX.current =
+    currentX;
+
+  lastDragTime.current =
+    currentTime;
+
+
+  /*
+    Update footer immediately
+  */
+
+  updateFooterPosition();
+
+
+  /*
+    Apple-style tick
+  */
+
+  const movementX =
+    Math.abs(dx);
+
+
+  if (movementX > 0.5) {
+
+    playFooterTick(
+      movementX
+    );
+
+  }
+
+};
+
+
+/* =========================
+   DRAG END
+========================= */
+
+const handleFooterPointerUp = () => {
+
+  /*
+    IMPORTANT:
+    Velocity reset nahi karna.
+
+    Isi velocity se release ke
+    baad momentum chalega.
+  */
+
+  setIsDraggingFooter(false);
+
+};
+
+  /* =========================
+     SEND EMAIL
+  ========================= */
+
+  const sendEmail = (e) => {
+
+    e.preventDefault();
+
+    emailjs
+      .sendForm(
+        "service_dsxso57",
+        "template_3l3s268",
+        form.current,
+        "v4eFm7ZlT-h639THZ"
+      )
+      .then(() => {
+
+        alert(
+          "✅ Message Sent Successfully!"
+        );
+
+        form.current.reset();
+
+      })
+      .catch((error) => {
+
+        console.log(error);
+
+        alert(
+          "❌ Failed to send message."
+        );
+
+      });
+  };
+
+
   return (
     <>
       {/* ================= ABOUT ================= */}
@@ -477,9 +1057,26 @@ const sendEmail = (e) => {
       </div>
 
       <div className="project-buttons">
-        <button>Live</button>
-        <button>GitHub</button>
-      </div>
+
+  <a
+    href="https://vishal-sharma-portfoliome.netlify.app"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="project-btn live-btn"
+  >
+    Live
+  </a>
+
+  <a
+    href="https://github.com/vishalexplore/portfolio"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="project-btn github-btn"
+  >
+    GitHub
+  </a>
+
+</div>
 
     </div>
 
@@ -574,11 +1171,62 @@ const sendEmail = (e) => {
 
 <footer className="footer">
 
-  <h3>VISHAL</h3>
+  <div
+  className="footer-track"
+  onPointerDown={handleFooterPointerDown}
+  onPointerMove={handleFooterPointerMove}
+  onPointerUp={handleFooterPointerUp}
+  onPointerCancel={handleFooterPointerUp}
+>
 
-  <p>
-    Designed & Developed with ❤️ using React
-  </p>
+    <div
+  className="footer-moving-text"
+  ref={footerTextRef}
+>
+
+      <span>✦ VISHAL</span>
+      <span>FULL STACK DEVELOPER</span>
+      <span>✦ REACT</span>
+      <span>✦ JAVASCRIPT</span>
+      <span>✦ NODE.JS</span>
+      <span>✦ AI &amp; ML</span>
+      <span>✦ BUILD • CREATE • INNOVATE</span>
+
+      <span>✦ VISHAL</span>
+      <span>FULL STACK DEVELOPER</span>
+      <span>✦ REACT</span>
+      <span>✦ JAVASCRIPT</span>
+      <span>✦ NODE.JS</span>
+      <span>✦ AI &amp; ML</span>
+      <span>✦ BUILD • CREATE • INNOVATE</span>
+
+      <span>✦ VISHAL</span>
+      <span>FULL STACK DEVELOPER</span>
+      <span>✦ REACT</span>
+      <span>✦ JAVASCRIPT</span>
+      <span>✦ NODE.JS</span>
+      <span>✦ AI &amp; ML</span>
+      <span>✦ BUILD • CREATE • INNOVATE</span>
+
+    </div>
+
+  </div>
+
+  <div className="footer-main">
+
+    <h3>
+      VISHAL<span>.</span>
+    </h3>
+
+    <p>
+      Designed &amp; Developed with ❤️ using React
+    </p>
+
+    <small>
+      Turning ideas into digital experiences 🚀
+    </small>
+
+  </div>
 
 </footer>
 

@@ -149,6 +149,13 @@ function Navbar({ theme, toggleTheme }) {
           Certificates
         </Link>
 
+        <Link
+  to="/resume"
+  onClick={() => setMenuOpen(false)}
+>
+  Resume
+</Link>
+
         <a
           href="#contact"
           className={active === "contact" ? "active" : ""}

@@ -12,6 +12,59 @@ import "../styles/aiChat.css";
 
 function AIChat() {
   const [open, setOpen] = useState(false);
+  // CLOSE AI ON OUTSIDE CLICK + MOBILE BACK
+useEffect(() => {
+  if (!open) return;
+
+  // Browser history me temporary entry
+  window.history.pushState({ aiOpen: true }, "");
+
+  // Mobile Back button
+  const handleBack = () => {
+    setOpen(false);
+  };
+
+  // Chat ke bahar click/tap
+  const handleOutsideClick = (event) => {
+    const chat = document.querySelector(".ai-chat");
+    const button = document.querySelector(".ai-button");
+
+    if (!chat || !button) return;
+
+    if (
+      !chat.contains(event.target) &&
+      !button.contains(event.target)
+    ) {
+      setOpen(false);
+    }
+  };
+
+  window.addEventListener("popstate", handleBack);
+
+  document.addEventListener(
+    "mousedown",
+    handleOutsideClick
+  );
+
+  document.addEventListener(
+    "touchstart",
+    handleOutsideClick
+  );
+
+  return () => {
+    window.removeEventListener("popstate", handleBack);
+
+    document.removeEventListener(
+      "mousedown",
+      handleOutsideClick
+    );
+
+    document.removeEventListener(
+      "touchstart",
+      handleOutsideClick
+    );
+  };
+}, [open]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
 

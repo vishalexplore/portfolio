@@ -8,7 +8,7 @@ import {
   FaMicrophone,
 } from "react-icons/fa";
 
-function Navbar({ theme, toggleTheme }) {
+function Navbar({ theme, toggleTheme, logoAnimate }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [active, setActive] = useState("home");
   const [scrolled, setScrolled] = useState(false);
@@ -105,11 +105,75 @@ function Navbar({ theme, toggleTheme }) {
         scrolled ? "navbar-scroll" : ""
       }`}
     >
-      <Link to="/" className="logo">
-        Vishal<span>.</span>
-      </Link>
+
+      {/* ==========================
+          VISHAL LOGO
+      ========================== */}
+
+      <a
+        href="/"
+        className={`logo ${
+          logoAnimate ? "logo-animate" : ""
+        }`}
+        aria-label="Vishal Home"
+      >
+        <span
+          className="logo-letter"
+          style={{ "--logo-delay": "0s" }}
+        >
+          V
+        </span>
+
+        <span
+          className="logo-letter"
+          style={{ "--logo-delay": "0.10s" }}
+        >
+          i
+        </span>
+
+        <span
+          className="logo-letter"
+          style={{ "--logo-delay": "0.20s" }}
+        >
+          s
+        </span>
+
+        <span
+          className="logo-letter"
+          style={{ "--logo-delay": "0.30s" }}
+        >
+          h
+        </span>
+
+        <span
+          className="logo-letter"
+          style={{ "--logo-delay": "0.40s" }}
+        >
+          a
+        </span>
+
+        <span
+          className="logo-letter"
+          style={{ "--logo-delay": "0.50s" }}
+        >
+          l
+        </span>
+
+        <span
+          className="logo-dot"
+          style={{ "--logo-delay": "0.60s" }}
+        >
+          .
+        </span>
+      </a>
+
+
+      {/* ==========================
+          NAVIGATION
+      ========================== */}
 
       <nav className={menuOpen ? "nav active" : "nav"}>
+
         <a
           href="#home"
           className={active === "home" ? "active" : ""}
@@ -150,11 +214,11 @@ function Navbar({ theme, toggleTheme }) {
         </Link>
 
         <Link
-  to="/resume"
-  onClick={() => setMenuOpen(false)}
->
-  Resume
-</Link>
+          to="/resume"
+          onClick={() => setMenuOpen(false)}
+        >
+          Resume
+        </Link>
 
         <a
           href="#contact"
@@ -176,9 +240,16 @@ function Navbar({ theme, toggleTheme }) {
               : "Dark Mode"}
           </span>
         </button>
+
       </nav>
 
+
+      {/* ==========================
+          RIGHT SIDE
+      ========================== */}
+
       <div className="nav-right">
+
         <button
           className="theme-btn"
           onClick={toggleTheme}
@@ -204,7 +275,9 @@ function Navbar({ theme, toggleTheme }) {
         >
           {menuOpen ? <FaTimes /> : <FaBars />}
         </button>
+
       </div>
+
     </header>
   );
 }

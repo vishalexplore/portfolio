@@ -5,6 +5,7 @@ import {
   BrowserRouter,
   Routes,
   Route,
+  useLocation,
 } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
@@ -16,6 +17,29 @@ import Home from "./pages/Home";
 import Certificates from "./pages/Certificates";
 import Resume from "./pages/Resume";
 
+
+/* ==========================
+   SCROLL TO TOP ON ROUTE CHANGE
+========================== */
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant",
+    });
+  }, [pathname]);
+
+  return null;
+}
+
+
+/* ==========================
+   MAIN APP
+========================== */
 
 function App() {
 
@@ -50,6 +74,13 @@ function App() {
   ========================== */
 
   const [showIntro, setShowIntro] = useState(true);
+
+
+  /* ==========================
+     LOGO ANIMATION
+  ========================== */
+
+  const [logoAnimate, setLogoAnimate] = useState(false);
 
 
   /* ==========================
@@ -108,7 +139,8 @@ function App() {
 
     window.addEventListener(
       "scroll",
-      handleScroll
+      handleScroll,
+      { passive: true }
     );
 
     handleScroll();
@@ -140,6 +172,22 @@ function App() {
 
 
   /* ==========================
+     INTRO FINISHED
+     → START LOGO ANIMATION
+  ========================== */
+
+  const handleIntroFinish = () => {
+
+    setShowIntro(false);
+
+    setTimeout(() => {
+      setLogoAnimate(true);
+    }, 120);
+
+  };
+
+
+  /* ==========================
      BACK TO TOP
   ========================== */
 
@@ -158,12 +206,19 @@ function App() {
     <BrowserRouter>
 
       {/* ==========================
+          ROUTE SCROLL RESET
+      ========================== */}
+
+      <ScrollToTop />
+
+
+      {/* ==========================
           APPLE-INSPIRED INTRO
       ========================== */}
 
       {showIntro && (
         <IntroScreen
-          onFinish={() => setShowIntro(false)}
+          onFinish={handleIntroFinish}
         />
       )}
 
@@ -173,6 +228,7 @@ function App() {
       ========================== */}
 
       <div className="app">
+
 
         {/* ==========================
             SCROLL PROGRESS
@@ -195,6 +251,7 @@ function App() {
           toggleTheme={toggleTheme}
           accent={accent}
           setAccent={setAccent}
+          logoAnimate={logoAnimate}
         />
 
 

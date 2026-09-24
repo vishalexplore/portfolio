@@ -5359,3 +5359,379 @@ body[data-accent="orange"] {
 .footer-moving-text {
   animation: none !important;
 }
+
+/* =========================================
+   VISHAL LOGO — LETTER THROW ANIMATION
+========================================= */
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+
+  font-family: "IBM Plex Mono", monospace !important;
+  font-size: 25px;
+  font-weight: 700;
+
+  color: var(--text) !important;
+  text-decoration: none !important;
+
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none;
+  outline: none !important;
+
+  overflow: visible;
+}
+
+
+/* EACH LETTER */
+
+.logo-letter {
+  display: inline-block;
+
+  opacity: 0;
+
+  transform:
+    translateX(-45px)
+    rotate(-12deg)
+    scale(0.85);
+
+  animation: logoLetterThrow 0.48s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    forwards;
+}
+
+
+/* ONE-BY-ONE DELAY */
+
+.logo-letter:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.logo-letter:nth-child(2) {
+  animation-delay: 0.13s;
+}
+
+.logo-letter:nth-child(3) {
+  animation-delay: 0.21s;
+}
+
+.logo-letter:nth-child(4) {
+  animation-delay: 0.29s;
+}
+
+.logo-letter:nth-child(5) {
+  animation-delay: 0.37s;
+}
+
+.logo-letter:nth-child(6) {
+  animation-delay: 0.45s;
+}
+
+
+/* DOT LAST */
+
+.logo-dot {
+  display: inline-block;
+
+  font-family: "IBM Plex Mono", monospace !important;
+
+  color: var(--text) !important;
+
+  opacity: 0;
+
+  transform:
+    translateX(-45px)
+    rotate(-12deg)
+    scale(0.85);
+
+  animation: logoLetterThrow 0.48s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    forwards;
+
+  animation-delay: 0.53s;
+}
+
+
+/* THROW FROM LEFT */
+
+@keyframes logoLetterThrow {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translateX(-45px)
+      rotate(-12deg)
+      scale(0.85);
+  }
+
+  65% {
+    opacity: 1;
+
+    transform:
+      translateX(5px)
+      rotate(2deg)
+      scale(1.03);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translateX(0)
+      rotate(0deg)
+      scale(1);
+  }
+
+}
+
+
+/* NO BLUE CLICK EFFECT */
+
+.logo:focus,
+.logo:active,
+.logo:focus-visible {
+  outline: none !important;
+  color: var(--text) !important;
+
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
+  .logo {
+    font-size: 23px;
+  }
+
+}
+
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .logo-letter,
+  .logo-dot {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+}
+
+
+/* =========================================
+   VISHAL LOGO
+   HIDDEN UNTIL INTRO FINISHES
+========================================= */
+
+.logo {
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none;
+  outline: none !important;
+  text-decoration: none;
+}
+
+
+/* =========================================
+   BEFORE INTRO FINISHES
+   Logo completely invisible
+========================================= */
+
+.logo:not(.logo-animate) .logo-letter,
+.logo:not(.logo-animate) .logo-dot {
+  opacity: 0;
+  visibility: hidden;
+}
+
+
+/* =========================================
+   AFTER INTRO
+   LETTER FLY-IN
+========================================= */
+
+.logo-animate .logo-letter {
+  display: inline-block;
+  position: relative;
+
+  opacity: 0;
+
+  animation-name: logoLetterFlyIn;
+  animation-duration: 0.65s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-delay: var(--logo-delay);
+  animation-fill-mode: forwards;
+}
+
+
+/* Dot */
+
+.logo-animate .logo-dot {
+  display: inline-block;
+  position: relative;
+
+  opacity: 0;
+
+  animation-name: logoDotFlyIn;
+  animation-duration: 0.65s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-delay: var(--logo-delay);
+  animation-fill-mode: forwards;
+}
+
+
+/* =========================================
+   LETTER MOTION
+========================================= */
+
+@keyframes logoLetterFlyIn {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translate3d(-100px, 0, 0)
+      rotate(-14deg)
+      scale(0.75);
+  }
+
+  55% {
+    opacity: 1;
+
+    transform:
+      translate3d(10px, 0, 0)
+      rotate(3deg)
+      scale(1.05);
+  }
+
+  78% {
+    transform:
+      translate3d(-3px, 0, 0)
+      rotate(0deg)
+      scale(1);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translate3d(0, 0, 0)
+      rotate(0deg)
+      scale(1);
+  }
+
+}
+
+
+/* =========================================
+   DOT MOTION
+   NO GLOW
+========================================= */
+
+@keyframes logoDotFlyIn {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translate3d(-100px, 0, 0)
+      rotate(-14deg)
+      scale(0.75);
+  }
+
+  55% {
+    opacity: 1;
+
+    transform:
+      translate3d(10px, 0, 0)
+      rotate(3deg)
+      scale(1.05);
+  }
+
+  78% {
+    transform:
+      translate3d(-3px, 0, 0)
+      rotate(0deg)
+      scale(1);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translate3d(0, 0, 0)
+      rotate(0deg)
+      scale(1);
+  }
+
+}
+
+
+/* =========================================
+   MOBILE TAP HIGHLIGHT OFF
+========================================= */
+
+.logo,
+.logo *,
+.nav a,
+.nav button,
+.menu-btn,
+.theme-btn,
+.voice-nav-btn,
+.mobile-theme-option {
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .logo:not(.logo-animate) .logo-letter,
+  .logo:not(.logo-animate) .logo-dot {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .logo-animate .logo-letter,
+  .logo-animate .logo-dot {
+    opacity: 1;
+    visibility: visible;
+    animation: none !important;
+    transform: none !important;
+  }
+
+}
+
+/* =========================================
+   MOBILE - PREVENT PAGE ZOOM
+========================================= */
+
+html {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  touch-action: manipulation;
+}
+
+/* Prevent accidental text selection on UI */
+button,
+a,
+.logo,
+.nav,
+.nav *,
+.menu-btn,
+.theme-btn,
+.voice-nav-btn {
+  -webkit-tap-highlight-color: transparent;
+}

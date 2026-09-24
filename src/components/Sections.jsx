@@ -676,10 +676,10 @@ const handleFooterPointerUp = () => {
           Python
         </span>
 
-        <span className="skill-item">
+        {/* <span className="skill-item">
           <FaJs className="icon js"/>
           JavaScript
-        </span>
+        </span> */}
 
         <span className="skill-item">
           <FaHtml5 className="icon html"/>
@@ -816,11 +816,6 @@ const handleFooterPointerUp = () => {
         <span className="skill-item">
           <SiNetlify className="icon"/>
           Netlify
-        </span>
-
-        <span className="skill-item">
-          <SiVercel className="icon"/>
-          Vercel
         </span>
 
         <span className="skill-item">

@@ -5,6 +5,8 @@ import {
   FaTimes,
   FaExternalLinkAlt,
   FaTrash,
+  FaUser,
+  FaMagic,
 } from "react-icons/fa";
 
 import aiData from "../data/aiData";
@@ -12,74 +14,36 @@ import "../styles/aiChat.css";
 
 function AIChat() {
   const [open, setOpen] = useState(false);
-  // CLOSE AI ON OUTSIDE CLICK + MOBILE BACK
-useEffect(() => {
-  if (!open) return;
-
-  // Browser history me temporary entry
-  window.history.pushState({ aiOpen: true }, "");
-
-  // Mobile Back button
-  const handleBack = () => {
-    setOpen(false);
-  };
-
-  // Chat ke bahar click/tap
-  const handleOutsideClick = (event) => {
-    const chat = document.querySelector(".ai-chat");
-    const button = document.querySelector(".ai-button");
-
-    if (!chat || !button) return;
-
-    if (
-      !chat.contains(event.target) &&
-      !button.contains(event.target)
-    ) {
-      setOpen(false);
-    }
-  };
-
-  window.addEventListener("popstate", handleBack);
-
-  document.addEventListener(
-    "mousedown",
-    handleOutsideClick
-  );
-
-  document.addEventListener(
-    "touchstart",
-    handleOutsideClick
-  );
-
-  return () => {
-    window.removeEventListener("popstate", handleBack);
-
-    document.removeEventListener(
-      "mousedown",
-      handleOutsideClick
-    );
-
-    document.removeEventListener(
-      "touchstart",
-      handleOutsideClick
-    );
-  };
-}, [open]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  const [messages, setMessages] = useState([
-    {
-      sender: "bot",
-      text: "👋 Hi! I'm Vishal AI.\nAsk me anything about Vishal.",
-    },
-  ]);
+  const welcomeMessage = {
+    sender: "bot",
+    text:
+      "👋 Hi! I'm Vishal AI.\nI'm Vishal's portfolio assistant. Ask me about his skills, projects, education, resume or contact details.",
+  };
+
+  const [messages, setMessages] = useState([welcomeMessage]);
 
   /* ==========================
-     AUTO SCROLL + AUTO FOCUS
+     OPEN / CLOSE
+  ========================== */
+
+  useEffect(() => {
+    if (!open) return;
+
+    const timer = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [open]);
+
+  /* ==========================
+     AUTO SCROLL
   ========================== */
 
   useEffect(() => {
@@ -89,17 +53,56 @@ useEffect(() => {
       behavior: "smooth",
       block: "end",
     });
-
-    // Answer complete hone ke baad input par focus
-    if (!typing) {
-      const timer = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
   }, [messages, typing, open]);
 
+  /* ==========================
+   AI CHAT CLOSE CONTROLS
+========================== */
+
+useEffect(() => {
+  if (!open) return;
+
+  window.history.pushState(
+    { aiChatOpen: true },
+    ""
+  );
+
+  const handleBack = () => {
+    setOpen(false);
+  };
+
+  const handleEscape = (event) => {
+    if (event.key === "Escape") {
+      setOpen(false);
+    }
+  };
+
+  const handleOutsideClick = (event) => {
+    const chatBox = document.querySelector(".ai-chat");
+    const aiButton = document.querySelector(".ai-button");
+
+    if (!chatBox || !aiButton) return;
+
+    if (
+      !chatBox.contains(event.target) &&
+      !aiButton.contains(event.target)
+    ) {
+      setOpen(false);
+    }
+  };
+
+  window.addEventListener("popstate", handleBack);
+  document.addEventListener("keydown", handleEscape);
+  document.addEventListener("mousedown", handleOutsideClick);
+  document.addEventListener("touchstart", handleOutsideClick);
+
+  return () => {
+    window.removeEventListener("popstate", handleBack);
+    document.removeEventListener("keydown", handleEscape);
+    document.removeEventListener("mousedown", handleOutsideClick);
+    document.removeEventListener("touchstart", handleOutsideClick);
+  };
+}, [open]);
 
   /* ==========================
      SMART INTENT MATCHING
@@ -108,36 +111,40 @@ useEffect(() => {
   const getReply = (userText) => {
     const question = userText.toLowerCase().trim();
 
-    // Greeting
+    /* Greeting */
+
     if (
-      /^(hi|hii|hello|hey|helo|namaste|hy)\b/.test(
-        question
-      )
+      /^(hi|hii|hello|hey|helo|namaste|hy)\b/.test(question)
     ) {
       return aiData.hello;
     }
 
-    // About
+    /* About */
+
     if (
       question.includes("who is vishal") ||
       question.includes("about vishal") ||
       question.includes("tell me about vishal") ||
       question.includes("about him") ||
-      question.includes("who are you")
+      question.includes("who are you") ||
+      question.includes("introduce vishal")
     ) {
       return aiData.about;
     }
 
-    // Name
+    /* Name */
+
     if (
       question.includes("your name") ||
       question.includes("his name") ||
-      question.includes("vishal name")
+      question.includes("vishal name") ||
+      question === "name"
     ) {
       return aiData.name;
     }
 
-    // Skills
+    /* Skills */
+
     if (
       question.includes("skill") ||
       question.includes("technology") ||
@@ -145,24 +152,28 @@ useEffect(() => {
       question.includes("tech stack") ||
       question.includes("what can he code") ||
       question.includes("what does he know") ||
-      question.includes("programming")
+      question.includes("programming") ||
+      question.includes("technical")
     ) {
       return aiData.skills;
     }
 
-    // Projects
+    /* Projects */
+
     if (
       question.includes("project") ||
       question.includes("projects") ||
       question.includes("built") ||
       question.includes("build") ||
       question.includes("portfolio projects") ||
-      question.includes("what has he made")
+      question.includes("what has he made") ||
+      question.includes("work")
     ) {
       return aiData.projects;
     }
 
-    // Education
+    /* Education */
+
     if (
       question.includes("education") ||
       question.includes("college") ||
@@ -176,7 +187,8 @@ useEffect(() => {
       return aiData.education;
     }
 
-    // Certificates
+    /* Certificates */
+
     if (
       question.includes("certificate") ||
       question.includes("certificates") ||
@@ -186,19 +198,22 @@ useEffect(() => {
       return aiData.certificates;
     }
 
-    // Internship / Hire
+    /* Internship / Hire */
+
     if (
       question.includes("internship") ||
       question.includes("intern") ||
       question.includes("hire") ||
       question.includes("freelance") ||
       question.includes("work with vishal") ||
-      question.includes("available")
+      question.includes("available") ||
+      question.includes("job")
     ) {
       return aiData.hire;
     }
 
-    // GitHub
+    /* GitHub */
+
     if (
       question.includes("github") ||
       question.includes("source code") ||
@@ -209,7 +224,8 @@ useEffect(() => {
       return aiData.github;
     }
 
-    // LinkedIn
+    /* LinkedIn */
+
     if (
       question.includes("linkedin") ||
       question.includes("professional profile") ||
@@ -218,7 +234,8 @@ useEffect(() => {
       return aiData.linkedin;
     }
 
-    // Instagram
+    /* Instagram */
+
     if (
       question.includes("instagram") ||
       question.includes("insta") ||
@@ -227,7 +244,8 @@ useEffect(() => {
       return aiData.instagram;
     }
 
-    // Resume
+    /* Resume */
+
     if (
       question.includes("resume") ||
       question.includes("cv") ||
@@ -236,7 +254,8 @@ useEffect(() => {
       return aiData.resume;
     }
 
-    // Email
+    /* Email */
+
     if (
       question.includes("email") ||
       question.includes("mail") ||
@@ -245,7 +264,8 @@ useEffect(() => {
       return aiData.email;
     }
 
-    // Phone
+    /* Phone */
+
     if (
       question.includes("phone") ||
       question.includes("mobile") ||
@@ -255,7 +275,8 @@ useEffect(() => {
       return aiData.phone;
     }
 
-    // Contact
+    /* Contact */
+
     if (
       question.includes("contact") ||
       question.includes("reach him") ||
@@ -265,7 +286,8 @@ useEffect(() => {
       return aiData.contact;
     }
 
-    // Location
+    /* Location */
+
     if (
       question.includes("location") ||
       question.includes("where is vishal") ||
@@ -277,9 +299,10 @@ useEffect(() => {
       return aiData.location;
     }
 
+    /* Default */
+
     return aiData.default;
   };
-
 
   /* ==========================
      SEND MESSAGE
@@ -313,14 +336,12 @@ useEffect(() => {
           text: reply,
         },
       ]);
-    }, 1200);
+    }, 850);
   };
-
 
   const sendMessage = () => {
     processMessage(input);
   };
-
 
   /* ==========================
      QUICK QUESTIONS
@@ -332,7 +353,6 @@ useEffect(() => {
     processMessage(question);
   };
 
-
   /* ==========================
      CLEAR CHAT
   ========================== */
@@ -340,21 +360,13 @@ useEffect(() => {
   const clearChat = () => {
     if (typing) return;
 
-    setMessages([
-      {
-        sender: "bot",
-        text: "👋 Hi! I'm Vishal AI.\nAsk me anything about Vishal.",
-      },
-    ]);
-
+    setMessages([welcomeMessage]);
     setInput("");
 
-    // Clear ke baad bhi input focused rahe
     setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
   };
-
 
   /* ==========================
      RENDER MESSAGE
@@ -366,7 +378,6 @@ useEffect(() => {
     const lines = text.split("\n");
 
     return lines.map((line, index) => {
-
       const urlMatch = line.match(
         /(https?:\/\/[^\s]+)/i
       );
@@ -407,9 +418,7 @@ useEffect(() => {
 
             {afterUrl}
 
-            {index < lines.length - 1 && (
-              <br />
-            )}
+            {index < lines.length - 1 && <br />}
           </div>
         );
       }
@@ -421,14 +430,11 @@ useEffect(() => {
         >
           {line}
 
-          {index < lines.length - 1 && (
-            <br />
-          )}
+          {index < lines.length - 1 && <br />}
         </div>
       );
     });
   };
-
 
   return (
     <>
@@ -437,7 +443,9 @@ useEffect(() => {
       ========================== */}
 
       <button
-        className="ai-button"
+        className={`ai-button ${
+          open ? "ai-button-open" : ""
+        }`}
         onClick={() => setOpen((prev) => !prev)}
         aria-label={
           open
@@ -446,24 +454,11 @@ useEffect(() => {
         }
       >
         {open ? (
-          <>
-            <FaTimes className="ai-icon" />
-
-            <span className="ai-label">
-              Close
-            </span>
-          </>
+          <FaTimes className="ai-icon" />
         ) : (
-          <>
-            <FaRobot className="ai-icon" />
-
-            <span className="ai-label">
-              Ask AI
-            </span>
-          </>
+          <FaRobot className="ai-icon" />
         )}
       </button>
-
 
       {/* =========================
           AI CHAT
@@ -477,11 +472,23 @@ useEffect(() => {
           <div className="ai-header">
 
             <div className="ai-header-title">
-              <FaRobot />
 
-              <span>
-                Ask Vishal AI
+              <div className="ai-header-icon">
+                <FaRobot />
+              </div>
+
+              <div className="ai-header-text">
+                <strong>Vishal AI</strong>
+                <small>
+                  Portfolio Assistant
+                </small>
+              </div>
+
+              <span className="ai-status">
+                <span></span>
+                Online
               </span>
+
             </div>
 
             <button
@@ -496,10 +503,31 @@ useEffect(() => {
 
           </div>
 
-
           {/* BODY */}
 
           <div className="ai-body">
+
+            {/* WELCOME AREA */}
+
+            {messages.length === 1 &&
+              !typing && (
+                <div className="ai-welcome">
+
+                  <div className="ai-welcome-icon">
+                    <FaMagic />
+                  </div>
+
+                  <h3>
+                    How can I help?
+                  </h3>
+
+                  <p>
+                    Ask me anything about
+                    Vishal's portfolio.
+                  </p>
+
+                </div>
+              )}
 
             {/* QUICK ACTIONS */}
 
@@ -534,11 +562,11 @@ useEffect(() => {
 
               <button
                 onClick={() =>
-                  askQuickQuestion("certificates")
+                  askQuickQuestion("resume")
                 }
                 disabled={typing}
               >
-                🏆 Certificates
+                📄 Resume
               </button>
 
               <button
@@ -552,24 +580,6 @@ useEffect(() => {
 
               <button
                 onClick={() =>
-                  askQuickQuestion("linkedin")
-                }
-                disabled={typing}
-              >
-                💼 LinkedIn
-              </button>
-
-              <button
-                onClick={() =>
-                  askQuickQuestion("instagram")
-                }
-                disabled={typing}
-              >
-                📸 Instagram
-              </button>
-
-              <button
-                onClick={() =>
                   askQuickQuestion("contact")
                 }
                 disabled={typing}
@@ -578,7 +588,6 @@ useEffect(() => {
               </button>
 
             </div>
-
 
             {/* MESSAGES */}
 
@@ -591,28 +600,45 @@ useEffect(() => {
                     : "bot-msg"
                 }
               >
-                {renderMessage(message.text)}
+
+                <div className="message-avatar">
+
+                  {message.sender === "user" ? (
+                    <FaUser />
+                  ) : (
+                    <FaRobot />
+                  )}
+
+                </div>
+
+                <div className="message-content">
+                  {renderMessage(message.text)}
+                </div>
+
               </div>
             ))}
-
 
             {/* TYPING */}
 
             {typing && (
               <div className="bot-msg typing">
-                <span></span>
-                <span></span>
-                <span></span>
+
+                <div className="message-avatar">
+                  <FaRobot />
+                </div>
+
+                <div className="typing-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+
               </div>
             )}
-
-
-            {/* AUTO SCROLL */}
 
             <div ref={messagesEndRef}></div>
 
           </div>
-
 
           {/* FOOTER */}
 
@@ -621,14 +647,13 @@ useEffect(() => {
             <input
               ref={inputRef}
               type="text"
-              placeholder="Ask me anything..."
+              placeholder="Ask about Vishal..."
               value={input}
               disabled={typing}
               onChange={(e) =>
                 setInput(e.target.value)
               }
               onKeyDown={(e) => {
-
                 if (
                   e.key === "Enter" &&
                   !e.shiftKey
@@ -636,7 +661,6 @@ useEffect(() => {
                   e.preventDefault();
                   sendMessage();
                 }
-
               }}
             />
 

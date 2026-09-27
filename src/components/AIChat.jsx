@@ -1,50 +1,86 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FaRobot,
   FaPaperPlane,
   FaTimes,
   FaExternalLinkAlt,
   FaTrash,
-  FaUser,
-  FaMagic,
+  FaMicrophone,
+  FaVolumeUp,
+  FaStop,
+  FaArrowRight,
 } from "react-icons/fa";
 
 import aiData from "../data/aiData";
 import "../styles/aiChat.css";
 
+const STORAGE_KEY = "vishal-ai-chat-v2";
+
+const QUICK_ACTIONS = [
+  { label: "About", query: "about vishal", icon: "👋" },
+  { label: "Skills", query: "skills", icon: "💻" },
+  { label: "Projects", query: "projects", icon: "🚀" },
+  { label: "Resume", query: "resume", icon: "📄" },
+  { label: "GitHub", query: "github", icon: "🐙" },
+  { label: "Contact", query: "contact", icon: "📧" },
+];
+
+const SUGGESTIONS = [
+  "What projects has Vishal built?",
+  "What is Vishal's tech stack?",
+  "Is Vishal available for internship?",
+  "Show me Vishal's GitHub",
+];
+
+const normalize = (text = "") =>
+  text
+    .toLowerCase()
+    .replace(/[^\w\s.+#-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
 function AIChat() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const [messages, setMessages] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const replyTimerRef = useRef(null);
 
-  const welcomeMessage = {
-    sender: "bot",
-    text:
-      "👋 Hi! I'm Vishal AI.\nI'm Vishal's portfolio assistant. Ask me about his skills, projects, education, resume or contact details.",
-  };
-
-  const [messages, setMessages] = useState([welcomeMessage]);
-
-  /* ==========================
-     OPEN / CLOSE
-  ========================== */
+  const welcomeMessage = useMemo(
+    () => ({
+      id: "welcome",
+      sender: "bot",
+      text:
+        "👋 Hi! I'm Vishal AI.\n\nI can help you explore Vishal's skills, projects, education, resume, GitHub and contact information.\n\nTry asking me something or use the quick actions below.",
+      time: Date.now(),
+    }),
+    []
+  );
 
   useEffect(() => {
-    if (!open) return;
+    if (!messages.length) {
+      setMessages([welcomeMessage]);
+    }
+  }, [messages.length, welcomeMessage]);
 
-    const timer = setTimeout(() => {
-      inputRef.current?.focus();
-    }, 250);
-
-    return () => clearTimeout(timer);
-  }, [open]);
-
-  /* ==========================
-     AUTO SCROLL
-  ========================== */
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-40)));
+    } catch {}
+  }, [messages]);
 
   useEffect(() => {
     if (!open) return;
@@ -53,324 +89,412 @@ function AIChat() {
       behavior: "smooth",
       block: "end",
     });
+
+    if (!typing) {
+      const timer = setTimeout(() => inputRef.current?.focus(), 120);
+      return () => clearTimeout(timer);
+    }
   }, [messages, typing, open]);
 
-  /* ==========================
-   AI CHAT CLOSE CONTROLS
-========================== */
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") setOpen(false);
+    };
 
-useEffect(() => {
-  if (!open) return;
+    const handlePopState = () => {
+      if (open) setOpen(false);
+    };
 
-  window.history.pushState(
-    { aiChatOpen: true },
-    ""
-  );
+    document.addEventListener("keydown", handleEscape);
+    window.addEventListener("popstate", handlePopState);
 
-  const handleBack = () => {
-    setOpen(false);
-  };
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [open]);
 
-  const handleEscape = (event) => {
-    if (event.key === "Escape") {
-      setOpen(false);
-    }
-  };
+  useEffect(() => {
+    if (!open) return;
 
-  const handleOutsideClick = (event) => {
-    const chatBox = document.querySelector(".ai-chat");
-    const aiButton = document.querySelector(".ai-button");
+    window.history.pushState(
+      { vishalAI: true },
+      "",
+      window.location.href
+    );
 
-    if (!chatBox || !aiButton) return;
+    const handleOutside = (event) => {
+      const chat = document.querySelector(".ai-chat");
+      const button = document.querySelector(".ai-button");
 
-    if (
-      !chatBox.contains(event.target) &&
-      !aiButton.contains(event.target)
-    ) {
-      setOpen(false);
-    }
-  };
+      if (
+        chat &&
+        button &&
+        !chat.contains(event.target) &&
+        !button.contains(event.target)
+      ) {
+        setOpen(false);
+      }
+    };
 
-  window.addEventListener("popstate", handleBack);
-  document.addEventListener("keydown", handleEscape);
-  document.addEventListener("mousedown", handleOutsideClick);
-  document.addEventListener("touchstart", handleOutsideClick);
+    document.addEventListener("mousedown", handleOutside);
+    document.addEventListener("touchstart", handleOutside);
 
-  return () => {
-    window.removeEventListener("popstate", handleBack);
-    document.removeEventListener("keydown", handleEscape);
-    document.removeEventListener("mousedown", handleOutsideClick);
-    document.removeEventListener("touchstart", handleOutsideClick);
-  };
-}, [open]);
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      document.removeEventListener("touchstart", handleOutside);
+    };
+  }, [open]);
 
-  /* ==========================
-     SMART INTENT MATCHING
-  ========================== */
+  useEffect(() => {
+    return () => {
+      if (replyTimerRef.current) clearTimeout(replyTimerRef.current);
+      recognitionRef.current?.stop?.();
+      window.speechSynthesis?.cancel?.();
+    };
+  }, []);
 
-  const getReply = (userText) => {
-    const question = userText.toLowerCase().trim();
+  const findIntent = (rawText) => {
+    const question = normalize(rawText);
 
-    /* Greeting */
-
-    if (
-      /^(hi|hii|hello|hey|helo|namaste|hy)\b/.test(question)
-    ) {
-      return aiData.hello;
-    }
-
-    /* About */
-
-    if (
-      question.includes("who is vishal") ||
-      question.includes("about vishal") ||
-      question.includes("tell me about vishal") ||
-      question.includes("about him") ||
-      question.includes("who are you") ||
-      question.includes("introduce vishal")
-    ) {
-      return aiData.about;
-    }
-
-    /* Name */
-
-    if (
-      question.includes("your name") ||
-      question.includes("his name") ||
-      question.includes("vishal name") ||
-      question === "name"
-    ) {
-      return aiData.name;
-    }
-
-    /* Skills */
-
-    if (
-      question.includes("skill") ||
-      question.includes("technology") ||
-      question.includes("technologies") ||
-      question.includes("tech stack") ||
-      question.includes("what can he code") ||
-      question.includes("what does he know") ||
-      question.includes("programming") ||
-      question.includes("technical")
-    ) {
-      return aiData.skills;
-    }
-
-    /* Projects */
-
-    if (
-      question.includes("project") ||
-      question.includes("projects") ||
-      question.includes("built") ||
-      question.includes("build") ||
-      question.includes("portfolio projects") ||
-      question.includes("what has he made") ||
-      question.includes("work")
-    ) {
-      return aiData.projects;
-    }
-
-    /* Education */
-
-    if (
-      question.includes("education") ||
-      question.includes("college") ||
-      question.includes("university") ||
-      question.includes("degree") ||
-      question.includes("study") ||
-      question.includes("studying") ||
-      question.includes("btech") ||
-      question.includes("b.tech")
-    ) {
-      return aiData.education;
-    }
-
-    /* Certificates */
-
-    if (
-      question.includes("certificate") ||
-      question.includes("certificates") ||
-      question.includes("certification") ||
-      question.includes("achievement")
-    ) {
-      return aiData.certificates;
-    }
-
-    /* Internship / Hire */
-
-    if (
-      question.includes("internship") ||
-      question.includes("intern") ||
-      question.includes("hire") ||
-      question.includes("freelance") ||
-      question.includes("work with vishal") ||
-      question.includes("available") ||
-      question.includes("job")
-    ) {
-      return aiData.hire;
-    }
-
-    /* GitHub */
-
-    if (
-      question.includes("github") ||
-      question.includes("source code") ||
-      question.includes("code repository") ||
-      question.includes("repositories") ||
-      question.includes("repo")
-    ) {
-      return aiData.github;
-    }
-
-    /* LinkedIn */
-
-    if (
-      question.includes("linkedin") ||
-      question.includes("professional profile") ||
-      question.includes("professional account")
-    ) {
-      return aiData.linkedin;
-    }
-
-    /* Instagram */
-
-    if (
-      question.includes("instagram") ||
-      question.includes("insta") ||
-      question.includes("social media")
-    ) {
-      return aiData.instagram;
-    }
-
-    /* Resume */
-
-    if (
-      question.includes("resume") ||
-      question.includes("cv") ||
-      question.includes("curriculum vitae")
-    ) {
-      return aiData.resume;
-    }
-
-    /* Email */
-
-    if (
-      question.includes("email") ||
-      question.includes("mail") ||
-      question.includes("email address")
-    ) {
-      return aiData.email;
-    }
-
-    /* Phone */
-
-    if (
-      question.includes("phone") ||
-      question.includes("mobile") ||
-      question.includes("number") ||
-      question.includes("contact number")
-    ) {
-      return aiData.phone;
-    }
-
-    /* Contact */
-
-    if (
-      question.includes("contact") ||
-      question.includes("reach him") ||
-      question.includes("reach vishal") ||
-      question.includes("how can i contact")
-    ) {
-      return aiData.contact;
-    }
-
-    /* Location */
-
-    if (
-      question.includes("location") ||
-      question.includes("where is vishal") ||
-      question.includes("where does he live") ||
-      question.includes("from where") ||
-      question.includes("city") ||
-      question.includes("state")
-    ) {
-      return aiData.location;
-    }
-
-    /* Default */
-
-    return aiData.default;
-  };
-
-  /* ==========================
-     SEND MESSAGE
-  ========================== */
-
-  const processMessage = (text) => {
-    if (!text.trim() || typing) return;
-
-    const userText = text.trim();
-
-    setMessages((prev) => [
-      ...prev,
+    const intents = [
       {
-        sender: "user",
-        text: userText,
+        key: "hello",
+        words: ["hi", "hello", "hey", "namaste", "hii", "helo"],
+        reply: aiData.hello,
       },
-    ]);
+      {
+        key: "about",
+        words: ["who", "about", "vishal", "yourself", "profile", "introduction"],
+        reply: aiData.about,
+      },
+      {
+        key: "name",
+        words: ["name"],
+        reply: aiData.name,
+      },
+      {
+        key: "skills",
+        words: [
+          "skill",
+          "skills",
+          "technology",
+          "technologies",
+          "tech stack",
+          "programming",
+          "coding",
+          "language",
+          "languages",
+        ],
+        reply: aiData.skills,
+      },
+      {
+        key: "projects",
+        words: [
+          "project",
+          "projects",
+          "built",
+          "build",
+          "made",
+          "portfolio projects",
+          "work",
+        ],
+        reply: aiData.projects,
+      },
+      {
+        key: "education",
+        words: [
+          "education",
+          "college",
+          "university",
+          "degree",
+          "study",
+          "studying",
+          "btech",
+          "b.tech",
+        ],
+        reply: aiData.education,
+      },
+      {
+        key: "certificates",
+        words: [
+          "certificate",
+          "certificates",
+          "certification",
+          "achievement",
+        ],
+        reply: aiData.certificates,
+      },
+      {
+        key: "hire",
+        words: [
+          "internship",
+          "intern",
+          "hire",
+          "hiring",
+          "freelance",
+          "available",
+          "work with",
+          "opportunity",
+        ],
+        reply: aiData.hire,
+      },
+      {
+        key: "github",
+        words: [
+          "github",
+          "source code",
+          "repository",
+          "repositories",
+          "repo",
+        ],
+        reply: aiData.github,
+      },
+      {
+        key: "linkedin",
+        words: ["linkedin", "professional profile"],
+        reply: aiData.linkedin,
+      },
+      {
+        key: "instagram",
+        words: ["instagram", "insta", "social media"],
+        reply: aiData.instagram,
+      },
+      {
+        key: "resume",
+        words: ["resume", "cv", "curriculum vitae"],
+        reply: aiData.resume,
+      },
+      {
+        key: "email",
+        words: ["email", "mail", "email address"],
+        reply: aiData.email,
+      },
+      {
+        key: "phone",
+        words: ["phone", "mobile", "number", "contact number"],
+        reply: aiData.phone,
+      },
+      {
+        key: "contact",
+        words: ["contact", "reach", "connect", "message"],
+        reply: aiData.contact,
+      },
+      {
+        key: "location",
+        words: ["location", "where", "city", "state", "from"],
+        reply: aiData.location,
+      },
+    ];
 
+    let best = null;
+    let bestScore = 0;
+
+    intents.forEach((intent) => {
+      let score = 0;
+
+      intent.words.forEach((word) => {
+        const cleanWord = normalize(word);
+
+        if (question === cleanWord) score += 8;
+        if (question.includes(cleanWord)) score += cleanWord.includes(" ") ? 5 : 2;
+      });
+
+      if (
+        intent.key === "about" &&
+        (question.includes("who is") || question.includes("tell me about"))
+      ) {
+        score += 7;
+      }
+
+      if (
+        intent.key === "contact" &&
+        (question.includes("how can i") || question.includes("reach"))
+      ) {
+        score += 5;
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        best = intent;
+      }
+    });
+
+    return bestScore >= 2 ? best : null;
+  };
+
+  const getReply = (text) => {
+    const result = findIntent(text);
+
+    if (result?.reply) {
+      return {
+        text: result.reply,
+        intent: result.key,
+      };
+    }
+
+    return {
+      text:
+        aiData.default ||
+        "I can help you explore Vishal's portfolio. Try asking about his skills, projects, education, resume, GitHub or contact details.",
+      intent: "default",
+    };
+  };
+
+  const navigateTo = (path) => {
+    setOpen(false);
+
+    if (path.startsWith("http")) {
+      window.open(path, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    window.location.href = path;
+  };
+
+  const getActionForIntent = (intent) => {
+    const actions = {
+      projects: { label: "View Projects", path: "/#projects" },
+      skills: { label: "View Skills", path: "/#skills" },
+      education: { label: "View Education", path: "/#education" },
+      certificates: { label: "View Certificates", path: "/certificates" },
+      resume: { label: "Open Resume", path: "/resume" },
+      github: {
+        label: "Open GitHub",
+        path: "https://github.com/vishalexplore",
+      },
+      linkedin: {
+        label: "Open LinkedIn",
+        path: "https://www.linkedin.com/",
+      },
+      instagram: {
+        label: "Open Instagram",
+        path: "https://www.instagram.com/hacknexplain/",
+      },
+      contact: { label: "Contact Vishal", path: "/#contact" },
+    };
+
+    return actions[intent] || null;
+  };
+
+  const processMessage = (rawText) => {
+    if (!rawText.trim() || typing) return;
+
+    const userText = rawText.trim();
+    const answer = getReply(userText);
+    const action = getActionForIntent(answer.intent);
+
+    const userMessage = {
+      id: `${Date.now()}-user`,
+      sender: "user",
+      text: userText,
+      time: Date.now(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setTyping(true);
 
-    const reply = getReply(userText);
+    const delay = Math.min(
+      1500,
+      Math.max(550, answer.text.length * 7)
+    );
 
-    setTimeout(() => {
+    replyTimerRef.current = setTimeout(() => {
       setTyping(false);
 
       setMessages((prev) => [
         ...prev,
         {
+          id: `${Date.now()}-bot`,
           sender: "bot",
-          text: reply,
+          text: answer.text,
+          intent: answer.intent,
+          action,
+          time: Date.now(),
         },
       ]);
-    }, 850);
+    }, delay);
   };
-
-  const sendMessage = () => {
-    processMessage(input);
-  };
-
-  /* ==========================
-     QUICK QUESTIONS
-  ========================== */
-
-  const askQuickQuestion = (question) => {
-    if (typing) return;
-
-    processMessage(question);
-  };
-
-  /* ==========================
-     CLEAR CHAT
-  ========================== */
 
   const clearChat = () => {
     if (typing) return;
 
-    setMessages([welcomeMessage]);
-    setInput("");
+    localStorage.removeItem(STORAGE_KEY);
 
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 100);
+    setMessages([
+      {
+        ...welcomeMessage,
+        id: `welcome-${Date.now()}`,
+        time: Date.now(),
+      },
+    ]);
+
+    setInput("");
+    window.speechSynthesis?.cancel?.();
+    setSpeaking(false);
+
+    setTimeout(() => inputRef.current?.focus(), 100);
   };
 
-  /* ==========================
-     RENDER MESSAGE
-  ========================== */
+  const toggleSpeech = (text) => {
+    if (!("speechSynthesis" in window)) return;
+
+    if (speaking) {
+      window.speechSynthesis.cancel();
+      setSpeaking(false);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(
+      text.replace(/https?:\/\/\S+/g, "")
+    );
+
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.onend = () => setSpeaking(false);
+
+    setSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const toggleVoiceInput = () => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setInput("Voice input is not supported in this browser.");
+      return;
+    }
+
+    if (listening) {
+      recognitionRef.current?.stop();
+      setListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-IN";
+    recognition.interimResults = true;
+    recognition.continuous = false;
+
+    recognition.onstart = () => setListening(true);
+
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map((result) => result[0]?.transcript || "")
+        .join("");
+
+      setInput(transcript);
+    };
+
+    recognition.onerror = () => setListening(false);
+    recognition.onend = () => setListening(false);
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  };
 
   const renderMessage = (text) => {
     if (!text) return null;
@@ -378,17 +502,11 @@ useEffect(() => {
     const lines = text.split("\n");
 
     return lines.map((line, index) => {
-      const urlMatch = line.match(
-        /(https?:\/\/[^\s]+)/i
-      );
+      const urlMatch = line.match(/(https?:\/\/[^\s]+)/i);
 
       if (urlMatch) {
         const rawUrl = urlMatch[0];
-
-        const url = rawUrl.replace(
-          /[),.!?]+$/,
-          ""
-        );
+        const url = rawUrl.replace(/[),.!?]+$/, "");
 
         const beforeUrl = line.substring(
           0,
@@ -400,36 +518,26 @@ useEffect(() => {
         );
 
         return (
-          <div
-            key={index}
-            className="ai-message-line"
-          >
+          <div key={index} className="ai-message-line">
             {beforeUrl}
-
             <a
               href={url}
               target="_blank"
               rel="noopener noreferrer"
               className="ai-open-link"
             >
-              <FaExternalLinkAlt />
+              <FaExternalLinkAlt className="ai-original-icon" />
               Open Link
             </a>
-
             {afterUrl}
-
             {index < lines.length - 1 && <br />}
           </div>
         );
       }
 
       return (
-        <div
-          key={index}
-          className="ai-message-line"
-        >
+        <div key={index} className="ai-message-line">
           {line}
-
           {index < lines.length - 1 && <br />}
         </div>
       );
@@ -438,57 +546,39 @@ useEffect(() => {
 
   return (
     <>
-      {/* =========================
-          FLOATING AI BUTTON
-      ========================== */}
-
       <button
-        className={`ai-button ${
-          open ? "ai-button-open" : ""
-        }`}
+        className={`ai-button ${open ? "ai-button-open" : ""}`}
         onClick={() => setOpen((prev) => !prev)}
-        aria-label={
-          open
-            ? "Close AI Assistant"
-            : "Open AI Assistant"
-        }
+        aria-label={open ? "Close AI Assistant" : "Open AI Assistant"}
       >
         {open ? (
-          <FaTimes className="ai-icon" />
+          <>
+            <FaTimes className="ai-icon ai-original-icon" />
+            <span className="ai-label">Close</span>
+          </>
         ) : (
-          <FaRobot className="ai-icon" />
+          <>
+            <FaRobot className="ai-icon ai-original-icon" />
+            <span className="ai-label">Ask AI</span>
+          </>
         )}
       </button>
 
-      {/* =========================
-          AI CHAT
-      ========================== */}
-
       {open && (
-        <div className="ai-chat">
-
-          {/* HEADER */}
-
+        <div className="ai-chat" role="dialog" aria-label="Vishal AI Assistant">
           <div className="ai-header">
-
             <div className="ai-header-title">
-
-              <div className="ai-header-icon">
-                <FaRobot />
+              <div className="ai-avatar">
+                <FaRobot className="ai-original-icon" />
+                <span />
               </div>
 
-              <div className="ai-header-text">
+              <div>
                 <strong>Vishal AI</strong>
                 <small>
-                  Portfolio Assistant
+                  <i /> Portfolio Assistant
                 </small>
               </div>
-
-              <span className="ai-status">
-                <span></span>
-                Online
-              </span>
-
             </div>
 
             <button
@@ -498,184 +588,151 @@ useEffect(() => {
               title="Clear Chat"
               aria-label="Clear Chat"
             >
-              <FaTrash />
+              <FaTrash className="ai-original-icon" />
             </button>
-
           </div>
 
-          {/* BODY */}
-
           <div className="ai-body">
-
-            {/* WELCOME AREA */}
-
-            {messages.length === 1 &&
-              !typing && (
-                <div className="ai-welcome">
-
-                  <div className="ai-welcome-icon">
-                    <FaMagic />
-                  </div>
-
-                  <h3>
-                    How can I help?
-                  </h3>
-
-                  <p>
-                    Ask me anything about
-                    Vishal's portfolio.
-                  </p>
-
-                </div>
-              )}
-
-            {/* QUICK ACTIONS */}
-
-            <div className="quick-actions">
-
-              <button
-                onClick={() =>
-                  askQuickQuestion("skills")
-                }
-                disabled={typing}
-              >
-                💻 Skills
-              </button>
-
-              <button
-                onClick={() =>
-                  askQuickQuestion("projects")
-                }
-                disabled={typing}
-              >
-                🚀 Projects
-              </button>
-
-              <button
-                onClick={() =>
-                  askQuickQuestion("education")
-                }
-                disabled={typing}
-              >
-                🎓 Education
-              </button>
-
-              <button
-                onClick={() =>
-                  askQuickQuestion("resume")
-                }
-                disabled={typing}
-              >
-                📄 Resume
-              </button>
-
-              <button
-                onClick={() =>
-                  askQuickQuestion("github")
-                }
-                disabled={typing}
-              >
-                🐙 GitHub
-              </button>
-
-              <button
-                onClick={() =>
-                  askQuickQuestion("contact")
-                }
-                disabled={typing}
-              >
-                📧 Contact
-              </button>
-
+            <div className="ai-status-card">
+              <div className="ai-status-dot" />
+              <div>
+                <strong>Ask me anything</strong>
+                <span>I know Vishal's portfolio, projects and profile.</span>
+              </div>
             </div>
 
-            {/* MESSAGES */}
+            <div className="quick-actions">
+              {QUICK_ACTIONS.map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => processMessage(item.query)}
+                  disabled={typing}
+                >
+                  <span>{item.icon}</span>
+                  {item.label}
+                </button>
+              ))}
+            </div>
 
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <div
-                key={index}
-                className={
-                  message.sender === "user"
-                    ? "user-msg"
-                    : "bot-msg"
-                }
+                key={message.id}
+                className={`ai-message-row ${message.sender}`}
               >
+                <div className="ai-message-avatar">
+                  {message.sender === "bot" ? <FaRobot className="ai-original-icon" /> : "V"}
+                </div>
 
-                <div className="message-avatar">
+                <div className="ai-message-wrap">
+                  <div className="ai-message">
+                    {renderMessage(message.text)}
+                  </div>
 
-                  {message.sender === "user" ? (
-                    <FaUser />
-                  ) : (
-                    <FaRobot />
+                  <div className="ai-message-meta">
+                    <span>
+                      {new Date(message.time || Date.now()).toLocaleTimeString(
+                        [],
+                        { hour: "2-digit", minute: "2-digit" }
+                      )}
+                    </span>
+
+                    {message.sender === "bot" && (
+                      <button
+                        className="ai-speak"
+                        onClick={() => toggleSpeech(message.text)}
+                        title="Read aloud"
+                        aria-label="Read aloud"
+                      >
+                        {speaking ? <FaStop className="ai-original-icon" /> : <FaVolumeUp className="ai-original-icon" />}
+                      </button>
+                    )}
+                  </div>
+
+                  {message.sender === "bot" && message.action && (
+                    <button
+                      className="ai-action"
+                      onClick={() => navigateTo(message.action.path)}
+                    >
+                      {message.action.label}
+                      <FaArrowRight className="ai-original-icon" />
+                    </button>
                   )}
-
                 </div>
-
-                <div className="message-content">
-                  {renderMessage(message.text)}
-                </div>
-
               </div>
             ))}
 
-            {/* TYPING */}
+            {messages.length === 1 && !typing && (
+              <div className="ai-suggestions">
+                <span>Try asking</span>
 
-            {typing && (
-              <div className="bot-msg typing">
-
-                <div className="message-avatar">
-                  <FaRobot />
-                </div>
-
-                <div className="typing-dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-
+                {SUGGESTIONS.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    onClick={() => processMessage(suggestion)}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
               </div>
             )}
 
-            <div ref={messagesEndRef}></div>
+            {typing && (
+              <div className="ai-message-row bot">
+                <div className="ai-message-avatar">
+                  <FaRobot className="ai-original-icon" />
+                </div>
 
+                <div className="ai-message typing">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
           </div>
 
-          {/* FOOTER */}
-
           <div className="ai-footer">
+            <button
+              className={`ai-voice ${listening ? "listening" : ""}`}
+              onClick={toggleVoiceInput}
+              title={listening ? "Stop listening" : "Voice input"}
+              aria-label={listening ? "Stop listening" : "Voice input"}
+            >
+              {listening ? <FaStop className="ai-original-icon" /> : <FaMicrophone className="ai-original-icon" />}
+            </button>
 
             <input
               ref={inputRef}
               type="text"
-              placeholder="Ask about Vishal..."
+              placeholder={
+                listening ? "Listening..." : "Ask about Vishal..."
+              }
               value={input}
               disabled={typing}
-              onChange={(e) =>
-                setInput(e.target.value)
-              }
+              onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
-                if (
-                  e.key === "Enter" &&
-                  !e.shiftKey
-                ) {
+                if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  sendMessage();
+                  processMessage(input);
                 }
               }}
             />
 
             <button
-              onClick={sendMessage}
-              disabled={
-                !input.trim() || typing
-              }
+              className="ai-send"
+              onClick={() => processMessage(input)}
+              disabled={!input.trim() || typing}
               aria-label="Send message"
             >
-              <FaPaperPlane />
+              <FaPaperPlane className="ai-original-icon" />
             </button>
-
           </div>
 
+          <div className="ai-footer-note">
+            Vishal AI • Portfolio assistant
+          </div>
         </div>
       )}
     </>

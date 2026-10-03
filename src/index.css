@@ -6861,3 +6861,927 @@ button,
 .custom-cursor-dot {
   display: none !important;
 }
+
+/* =========================================================
+   PREMIUM ID PROFILE CARD
+   ========================================================= */
+
+.photo-card {
+  --phone-tilt: 0deg;
+
+  width: 270px;
+  height: 350px;
+
+  position: relative;
+
+  perspective: 1200px;
+
+  cursor: pointer;
+  flex-shrink: 0;
+
+  transform:
+    rotateZ(var(--phone-tilt))
+    translateY(0);
+
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+
+  isolation: isolate;
+}
+
+
+/* =========================================================
+   TOP CENTER RIBBON
+   ========================================================= */
+
+.photo-ribbon {
+  position: absolute;
+
+  top: -30px;
+  left: 50%;
+
+  width: 34px;
+  height: 72px;
+
+  transform: translateX(-50%);
+
+  z-index: 30;
+
+  pointer-events: none;
+}
+
+
+/* Main ribbon */
+
+.photo-ribbon::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 34px;
+  height: 58px;
+
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(
+        in srgb,
+        var(--accent) 95%,
+        white 5%
+      ),
+      var(--accent)
+    );
+
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    50% 82%,
+    0 100%
+  );
+
+  border-radius: 4px;
+
+  box-shadow:
+    0 5px 14px
+      color-mix(
+        in srgb,
+        var(--accent) 35%,
+        transparent
+      );
+
+  animation:
+    ribbonFloat 3.8s ease-in-out infinite;
+}
+
+
+/* Ribbon hole */
+
+.photo-ribbon span {
+  position: absolute;
+
+  top: 11px;
+  left: 50%;
+
+  width: 9px;
+  height: 9px;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  background: var(--bg, #ffffff);
+
+  border:
+    2px solid
+    color-mix(
+      in srgb,
+      var(--accent) 80%,
+      transparent
+    );
+
+  z-index: 2;
+}
+
+
+/* =========================================================
+   HANGING CARD
+   ========================================================= */
+
+.photo-card-hanger {
+  width: 100%;
+  height: 100%;
+
+  position: relative;
+
+  transform-origin:
+    50% -24px;
+
+  animation:
+    idCardSwing 5.5s
+    ease-in-out
+    infinite;
+
+  will-change: transform;
+}
+
+
+/* =========================================================
+   CARD INNER / FLIP
+   ========================================================= */
+
+.photo-card-inner {
+  width: 100%;
+  height: 100%;
+
+  position: relative;
+
+  transform-style: preserve-3d;
+
+  transition:
+    transform 0.65s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    );
+
+  will-change: transform;
+}
+
+
+/* PHOTO MODE */
+
+.photo-mode-photo
+  .photo-card-inner {
+  transform: rotateY(0deg);
+}
+
+
+/* INFO MODE */
+
+.photo-mode-info
+  .photo-card-inner {
+  transform: rotateY(180deg);
+}
+
+
+/* QR MODE */
+
+.photo-mode-qr
+  .photo-card-inner {
+  transform: rotateY(360deg);
+}
+
+
+/* =========================================================
+   CARD FACE
+   ========================================================= */
+
+.photo-card-face {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  border-radius: 24px;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,0.96),
+      rgba(245,245,250,0.94)
+    );
+
+  border:
+    5px solid var(--accent);
+
+  box-shadow:
+    0 20px 45px
+      rgba(0,0,0,0.18),
+
+    0 0 0 1px
+      rgba(255,255,255,0.7)
+      inset,
+
+    0 0 25px
+      color-mix(
+        in srgb,
+        var(--accent) 22%,
+        transparent
+      );
+
+  color: #161616;
+}
+
+
+/* =========================================================
+   FRONT ID CARD
+   ========================================================= */
+
+.photo-card-front {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  padding: 12px;
+
+  gap: 9px;
+
+  background:
+    linear-gradient(
+      155deg,
+      #ffffff 0%,
+      #f7f7fb 55%,
+      #eeeeF7 100%
+    );
+}
+
+
+/* Top ID header */
+
+.id-card-header {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding:
+    4px 5px 2px;
+
+  font-family:
+    "IBM Plex Mono",
+    monospace;
+
+  color: #161616;
+}
+
+
+.id-card-header span {
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.4px;
+}
+
+
+.id-card-header small {
+  font-size: 7px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.8px;
+
+  opacity: 0.55;
+}
+
+
+/* =========================================================
+   PROFILE IMAGE
+   ========================================================= */
+
+.id-photo-wrapper {
+  position: relative;
+
+  width: 100%;
+  flex: 1;
+
+  min-height: 0;
+
+  overflow: hidden;
+
+  border-radius: 16px;
+
+  background: #e9e9ef;
+
+  border:
+    2px solid
+    color-mix(
+      in srgb,
+      var(--accent) 35%,
+      transparent
+    );
+
+  box-shadow:
+    0 8px 20px
+      rgba(0,0,0,0.12);
+}
+
+
+.id-photo-wrapper::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      125deg,
+      transparent 25%,
+      rgba(255,255,255,0.22) 48%,
+      transparent 65%
+    );
+
+  transform:
+    translateX(-120%);
+
+  animation:
+    idPhotoShine 4.5s
+    ease-in-out infinite;
+
+  pointer-events: none;
+}
+
+
+.photo-card-front img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  object-position: center;
+
+  border-radius: 14px;
+
+  transition:
+    transform 0.7s
+    cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    );
+}
+
+
+.photo-card:hover
+  .photo-card-front img {
+  transform: scale(1.035);
+}
+
+
+/* =========================================================
+   ID CARD FOOTER
+   ========================================================= */
+
+.id-card-footer {
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 2px;
+
+  padding:
+    1px 4px 3px;
+
+  font-family:
+    "IBM Plex Mono",
+    monospace;
+
+  text-align: center;
+}
+
+
+.id-card-footer strong {
+  font-size: 9px;
+
+  letter-spacing: 1px;
+
+  color: #151515;
+}
+
+
+.id-card-footer span {
+  font-size: 7px;
+
+  letter-spacing: 0.65px;
+
+  color: #666;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   INFO BACK
+   ========================================================= */
+
+.photo-card-info {
+  transform: rotateY(180deg);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 25px;
+
+  gap: 10px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #f1efff
+    );
+}
+
+
+.back-icon {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 13%,
+      white
+    );
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--accent) 35%,
+      transparent
+    );
+
+  font-size: 24px;
+
+  box-shadow:
+    0 8px 20px
+      color-mix(
+        in srgb,
+        var(--accent) 18%,
+        transparent
+      );
+}
+
+
+.photo-card-info h3 {
+  margin: 4px 0 0;
+
+  font-size: 25px;
+
+  font-weight: 800;
+}
+
+
+.photo-card-info p {
+  margin: 0;
+
+  font-size: 13px;
+
+  opacity: 0.65;
+}
+
+
+.back-skills {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  margin-top: 5px;
+}
+
+
+.back-skills span {
+  padding:
+    6px 9px;
+
+  border-radius: 999px;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--accent) 10%,
+      white
+    );
+
+  border:
+    1px solid
+    color-mix(
+      in srgb,
+      var(--accent) 30%,
+      transparent
+    );
+
+  color: #333;
+}
+
+
+.photo-card-info small {
+  margin-top: 8px;
+
+  font-size: 9px;
+
+  opacity: 0.5;
+
+  letter-spacing: 0.4px;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes idCardSwing {
+
+  0% {
+    transform:
+      rotate(-1.2deg)
+      translateY(0);
+  }
+
+  25% {
+    transform:
+      rotate(0.8deg)
+      translateY(-2px);
+  }
+
+  50% {
+    transform:
+      rotate(1.4deg)
+      translateY(0);
+  }
+
+  75% {
+    transform:
+      rotate(-0.7deg)
+      translateY(-1px);
+  }
+
+  100% {
+    transform:
+      rotate(-1.2deg)
+      translateY(0);
+  }
+
+}
+
+
+@keyframes ribbonFloat {
+
+  0%,
+  100% {
+    transform:
+      translateX(-50%)
+      translateY(0);
+  }
+
+  50% {
+    transform:
+      translateX(-50%)
+      translateY(-2px);
+  }
+
+}
+
+
+@keyframes idPhotoShine {
+
+  0% {
+    transform:
+      translateX(-120%);
+  }
+
+  45%,
+  100% {
+    transform:
+      translateX(120%);
+  }
+
+}
+
+
+/* =========================================================
+   HOVER
+   ========================================================= */
+
+.photo-card:hover {
+  transform:
+    rotateZ(var(--phone-tilt))
+    translateY(-5px);
+}
+
+
+.photo-card:active {
+  transform:
+    rotateZ(var(--phone-tilt))
+    translateY(-1px)
+    scale(0.985);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .photo-card {
+    width: 230px;
+    height: 300px;
+
+    --phone-tilt: 0deg;
+  }
+
+  .photo-ribbon {
+    top: -27px;
+
+    width: 30px;
+    height: 65px;
+  }
+
+  .photo-ribbon::before {
+    width: 30px;
+    height: 53px;
+  }
+
+  .photo-ribbon span {
+    top: 10px;
+
+    width: 8px;
+    height: 8px;
+  }
+
+  .photo-card-face {
+    border-radius: 21px;
+
+    border-width: 4px;
+  }
+
+  .photo-card-front {
+    padding: 9px;
+
+    gap: 7px;
+  }
+
+  .id-card-header span {
+    font-size: 8px;
+
+    letter-spacing: 1px;
+  }
+
+  .id-card-header small {
+    font-size: 6px;
+  }
+
+  .id-photo-wrapper {
+    border-radius: 13px;
+  }
+
+  .photo-card-front img {
+    border-radius: 11px;
+  }
+
+  .id-card-footer strong {
+    font-size: 7px;
+  }
+
+  .id-card-footer span {
+    font-size: 6px;
+  }
+
+  .photo-card-info {
+    padding: 18px;
+  }
+
+  .back-icon {
+    width: 44px;
+    height: 44px;
+
+    font-size: 20px;
+  }
+
+  .photo-card-info h3 {
+    font-size: 21px;
+  }
+
+  .photo-card-info p {
+    font-size: 11px;
+  }
+
+  .back-skills {
+    gap: 5px;
+  }
+
+  .back-skills span {
+    padding: 5px 7px;
+
+    font-size: 8px;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .photo-card {
+    width: 210px;
+    height: 275px;
+  }
+
+  .photo-card-hanger {
+    transform-origin:
+      50% -20px;
+  }
+
+  .photo-ribbon {
+    top: -24px;
+
+    width: 27px;
+    height: 58px;
+  }
+
+  .photo-ribbon::before {
+    width: 27px;
+    height: 48px;
+  }
+
+  .photo-ribbon span {
+    top: 9px;
+
+    width: 7px;
+    height: 7px;
+  }
+
+  .photo-card-front {
+    padding: 8px;
+
+    gap: 6px;
+  }
+
+  .id-card-header span {
+    font-size: 7px;
+  }
+
+  .id-card-header small {
+    font-size: 5px;
+  }
+
+  .id-card-footer strong {
+    font-size: 6.5px;
+  }
+
+  .id-card-footer span {
+    font-size: 5.5px;
+  }
+
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+.photo-card:focus,
+.photo-card:focus-visible {
+  outline: none;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .photo-card {
+    transition: none;
+  }
+
+  .photo-card-hanger,
+  .photo-ribbon::before,
+  .id-photo-wrapper::after {
+    animation: none;
+  }
+
+  .photo-card-inner {
+    transition: none;
+  }
+
+}
+
+/* =========================================================
+   FIX — ID CARD SAME SIZE IN LIGHT + DARK MODE
+   ========================================================= */
+
+body.light .photo-card,
+body.dark .photo-card {
+  width: 270px !important;
+  height: 350px !important;
+}
+
+body.light .photo-card-inner,
+body.dark .photo-card-inner {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+body.light .photo-card-face,
+body.dark .photo-card-face {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+body.light .photo-card-front,
+body.dark .photo-card-front {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+body.light .photo-card-front img,
+body.dark .photo-card-front img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+  body.light .photo-card,
+  body.dark .photo-card {
+    width: 230px !important;
+    height: 300px !important;
+  }
+}
+
+
+/* SMALL MOBILE */
+
+@media (max-width: 480px) {
+  body.light .photo-card,
+  body.dark .photo-card {
+    width: 210px !important;
+    height: 275px !important;
+  }
+}
